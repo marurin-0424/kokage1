@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<title>こかげ 歩行速度メジャー</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="歩行速度">
+<style>
+:root{--surface:#fcfcfb;--plane:#f4f4f1;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+ --hair:#e1e0d9;--ring:rgba(11,11,11,.10);--walk:#eb6834;--stop:#2a78d6;--sig:#4a3aa7;--ok:#0ca30c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--plane);color:var(--ink);
+ font-family:system-ui,-apple-system,"Hiragino Sans",sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:520px;margin:0 auto;padding:env(safe-area-inset-top) 14px calc(env(safe-area-inset-bottom) + 14px)}
+h1{font-size:19px;margin:14px 0 2px;letter-spacing:.04em}
+.sub{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+.card{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:14px;margin-bottom:12px}
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
+select,input{font:inherit;width:100%;padding:10px 11px;border:1px solid var(--ring);border-radius:10px;
+ background:var(--surface);color:var(--ink)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.clock{font-size:56px;font-weight:800;line-height:1;text-align:center;margin:6px 0 2px;
+ font-variant-numeric:tabular-nums}
+.state{text-align:center;font-size:14px;font-weight:700;margin-bottom:12px}
+.btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+button{font:inherit;font-size:16px;font-weight:700;border:2px solid var(--ring);border-radius:14px;
+ padding:22px 6px;background:var(--surface);color:var(--ink);cursor:pointer;line-height:1.25}
+button small{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-top:3px}
+button[data-on=true]{color:#fff;border-color:transparent}
+#bWalk[data-on=true]{background:var(--walk)} #bStop[data-on=true]{background:var(--stop)}
+#bSig[data-on=true]{background:var(--sig)}
+button[data-on=true] small{color:rgba(255,255,255,.85)}
+.wide{grid-column:1/-1;padding:15px}
+.ghost{background:var(--plane);border-color:var(--hair);font-weight:600;font-size:14px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:4px}
+.tile{border:1px solid var(--hair);border-radius:11px;padding:10px 12px;background:var(--surface)}
+.tile .k{font-size:11.5px;color:var(--muted)}
+.tile .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.tile .v small{font-size:13px;font-weight:600;margin-left:2px}
+.big{grid-column:1/-1;background:#f2f8f2;border-color:#bfe3bf}
+.big .v{font-size:38px}
+.hint{font-size:12.5px;color:var(--ink2);margin-top:10px}
+.laps{max-height:190px;overflow:auto;font-size:13px;font-variant-numeric:tabular-nums}
+.lap{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--hair)}
+.lap i{width:9px;height:9px;border-radius:50%;margin-top:6px;flex:0 0 auto}
+.lap b{margin-left:auto;font-weight:600}
+textarea{width:100%;height:130px;font:13px/1.5 ui-monospace,monospace;border:1px solid var(--ring);
+ border-radius:10px;padding:10px;background:var(--plane);color:var(--ink)}
+.note{font-size:12px;color:var(--muted);line-height:1.55}
+</style></head>
+<body><div class="wrap">
+<h1>こかげ 歩行速度メジャー</h1>
+<p class="sub">3〜5歳を連れた実際の分速を測ります。画面を消しても時間は正しく進みます。</p>
+
+<div class="card">
+  <label for="seg">測る区間</label>
+  <select id="seg">
+    <option value="849|24.2|3">都電雑司ヶ谷駅 → 東池袋中央公園（849m・信号3）</option>
+    <option value="706|20.2|0">池袋駅東口 → 元池袋史跡公園（706m）</option>
+    <option value="270|7.7|0">池袋駅東口 → 池袋駅前公園（270m）</option>
+    <option value="0|0|0">自分で入れる</option>
+  </select>
+  <div class="row2" style="margin-top:10px">
+    <div><label for="len">区間の長さ（m）</label><input id="len" type="number" inputmode="numeric" value="849"></div>
+    <div><label for="who">子どもの状態</label>
+      <select id="who"><option>歩いた</option><option>ときどき抱っこ</option><option>ずっと抱っこ</option><option>ベビーカー</option></select></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="clock" id="clock">0:00</div>
+  <div class="state" id="state" style="color:var(--muted)">「歩く」を押すと始まります</div>
+  <div class="btns">
+    <button id="bWalk" data-on="false">歩く<small>移動中</small></button>
+    <button id="bStop" data-on="false">止まる<small>しゃがむ・見る</small></button>
+    <button id="bSig"  data-on="false">信号待ち<small>横断待ち</small></button>
+    <button id="bEnd" class="wide ghost">到着（計測を終える）</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="tiles">
+    <div class="tile big"><div class="k">歩行速度（止まっている時間を除く）</div>
+      <div class="v"><span id="spd">—</span><small> m/分</small></div></div>
+    <div class="tile"><div class="k">総所要時間</div><div class="v"><span id="tTot">0.0</span><small> 分</small></div></div>
+    <div class="tile"><div class="k">うち歩いていた</div><div class="v"><span id="tWalk">0.0</span><small> 分</small></div></div>
+    <div class="tile"><div class="k">立ち止まり</div><div class="v"><span id="tStop">0.0</span><small> 分</small></div></div>
+    <div class="tile"><div class="k">信号待ち<span id="nSig"></span></div><div class="v"><span id="tSig">0.0</span><small> 分</small></div></div>
+  </div>
+  <p class="hint" id="cmp"></p>
+</div>
+
+<div class="card">
+  <label>切り替えの記録</label>
+  <div class="laps" id="laps"><p class="note">まだありません。</p></div>
+</div>
+
+<div class="card">
+  <label for="out">記録テンプレに貼る（長押しでコピー）</label>
+  <textarea id="out" readonly></textarea>
+  <div class="btns" style="margin-top:9px">
+    <button class="ghost" id="bCopy">コピー</button>
+    <button class="ghost" id="bReset">やり直す</button>
+    <button class="ghost" id="bKeep">画面を消さない</button>
+  </div>
+</div>
+
+<p class="note">
+★ <b>3回測ってください</b>（できれば別の日・別の時刻）。1回では足りません。<br>
+★ <b>「止まる」を正確に押すことが、いちばん大事です。</b>3〜5歳は必ず止まります。いまのモデルは立ち止まりの時間を持っていないので、ここが大きければモデルに項を足します。<br>
+★ 予測は 区間長 ÷ 35m/分（<code>spec.md</code> §10-4 の仮定）。<b>この35を、実測で置き換えるのが目的です。</b>
+</p>
+</div>
+
+<script>
+const $=s=>document.getElementById(s);
+let events=[], running=false, cur=null, t0=null, wake=null;
+const LBL={walk:'歩く',stop:'止まる',sig:'信号待ち'};
+const COL={walk:'#eb6834',stop:'#2a78d6',sig:'#4a3aa7'};
+
+$('seg').addEventListener('change',e=>{
+  const [len]=e.target.value.split('|');
+  if(+len>0) $('len').value=len;
+});
+function pred(){ const v=$('seg').value.split('|'); return {len:+$('len').value||0, min:+v[1]||0, sig:+v[2]||0}; }
+
+function totals(){
+  const now=Date.now(); const t={walk:0,stop:0,sig:0}; let nsig=0, prev=null;
+  const ev=events.slice();
+  if(running&&cur) ev.push({k:cur,at:now,end:true});
+  for(let i=0;i<ev.length;i++){
+    if(prev) t[prev.k]+=(ev[i].at-prev.at)/1000;
+    if(!ev[i].end) prev=ev[i]; else prev=null;
+  }
+  for(let i=0;i<events.length;i++) if(events[i].k==='sig') nsig++;
+  const tot=t0?((running?now:(events.length?events[events.length-1].at:now))-t0)/1000:0;
+  return {...t, tot, nsig};
+}
+function fmt(s){ const m=Math.floor(s/60), x=Math.floor(s%60); return m+':'+String(x).padStart(2,'0'); }
+function render(){
+  const T=totals(), p=pred();
+  $('clock').textContent=fmt(T.tot);
+  $('tTot').textContent=(T.tot/60).toFixed(1);
+  $('tWalk').textContent=(T.walk/60).toFixed(1);
+  $('tStop').textContent=(T.stop/60).toFixed(1);
+  $('tSig').textContent=(T.sig/60).toFixed(1);
+  $('nSig').textContent=T.nsig?`（${T.nsig}回）`:'';
+  const spd = T.walk>0 && p.len>0 ? p.len/(T.walk/60) : null;
+  $('spd').textContent = spd? spd.toFixed(0) : '—';
+  $('state').textContent = running? `いま：${LBL[cur]}` : (events.length? '計測を終えました':'「歩く」を押すと始まります');
+  $('state').style.color = running? COL[cur] : 'var(--muted)';
+  ['walk','stop','sig'].forEach(k=>$('b'+k[0].toUpperCase()+k.slice(1)).dataset.on=(running&&cur===k));
+  if(spd){
+    const d=spd-35, pc=(d/35*100);
+    $('cmp').innerHTML=`モデルの仮定は <b>35 m/分</b>。実測は <b>${spd.toFixed(0)} m/分</b>で、`+
+      `<b style="color:${Math.abs(pc)<10?'var(--ok)':'var(--walk)'}">${d>=0?'+':''}${pc.toFixed(0)}%</b>。`+
+      (p.min? ` 予測の歩行時間 ${p.min}分 に対して実測 ${(T.walk/60).toFixed(1)}分。`:'')+
+      (p.sig? ` 予測の信号 ${p.sig}回 に対して実測 ${T.nsig}回。`:'');
+  } else $('cmp').textContent='';
+  $('laps').innerHTML = events.length? events.map((e,i)=>
+    `<div class="lap"><i style="background:${e.end?'#0ca30c':COL[e.k]}"></i><span>${e.end?'到着':LBL[e.k]}</span><b>${fmt((e.at-t0)/1000)}</b></div>`).join('')
+    : '<p class="note">まだありません。</p>';
+  $('out').value = events.length? [
+    `【歩行速度の実測】`,
+    `区間：${$('seg').selectedOptions[0].text}`,
+    `区間長：${p.len} m ／ 子ども：${$('who').value}`,
+    `総所要 ${(T.tot/60).toFixed(1)}分 ＝ 歩行 ${(T.walk/60).toFixed(1)} ＋ 立ち止まり ${(T.stop/60).toFixed(1)} ＋ 信号待ち ${(T.sig/60).toFixed(1)}（${T.nsig}回）`,
+    `歩行速度：${spd?spd.toFixed(0):'—'} m/分（モデルの仮定 35 m/分）`,
+    `立ち止まりの割合：${T.tot?(T.stop/T.tot*100).toFixed(0):0}%`,
+    `気づいたこと：`
+  ].join('\n') : '';
+}
+function push(k){
+  const now=Date.now();
+  if(!running){ running=true; t0=now; events=[]; }
+  if(cur===k) return;
+  events.push({k,at:now}); cur=k; render();
+}
+$('bWalk').onclick=()=>push('walk'); $('bStop').onclick=()=>push('stop'); $('bSig').onclick=()=>push('sig');
+$('bEnd').onclick=()=>{ if(!running) return; events.push({k:cur,at:Date.now(),end:true}); running=false; cur=null; render(); };
+$('bReset').onclick=()=>{ if(events.length&&!confirm('記録を消してやり直しますか？')) return;
+  events=[];running=false;cur=null;t0=null;render(); };
+$('bCopy').onclick=async()=>{ try{ await navigator.clipboard.writeText($('out').value); $('bCopy').textContent='コピーしました'; setTimeout(()=>$('bCopy').textContent='コピー',1500);}catch(e){ $('out').select(); } };
+$('bKeep').onclick=async()=>{ try{ wake=await navigator.wakeLock.request('screen'); $('bKeep').textContent='画面を消しません'; }
+  catch(e){ $('bKeep').textContent='この端末では不可'; } };
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) render(); });
+setInterval(render,250); render();
+</script></body></html>

@@ -1,0 +1,530 @@
+{
+ "13": {
+  "rho_move_dist": 0.9921,
+  "rho_move_sun": 0.9664,
+  "rho_total_sun": 0.9298,
+  "n": 23,
+  "swaps": 7,
+  "best": {
+   "move": "池袋駅前公園",
+   "dist": "池袋駅前公園",
+   "sun": "池袋駅前公園",
+   "total": "東池袋中央公園"
+  },
+  "by_move": [
+   {
+    "name": "池袋駅前公園",
+    "move": 34,
+    "dist2": 540,
+    "sun_min": 5.01,
+    "total": 752
+   },
+   {
+    "name": "南池袋公園",
+    "move": 42,
+    "dist2": 575,
+    "sun_min": 5.87,
+    "total": 782
+   },
+   {
+    "name": "中池袋公園",
+    "move": 75,
+    "dist2": 987,
+    "sun_min": 12.4,
+    "total": 812
+   },
+   {
+    "name": "東池袋公園",
+    "move": 106,
+    "dist2": 1456,
+    "sun_min": 14.63,
+    "total": 834
+   },
+   {
+    "name": "東池袋中央公園",
+    "move": 117,
+    "dist2": 1760,
+    "sun_min": 12.72,
+    "total": 641
+   },
+   {
+    "name": "池袋西口公園",
+    "move": 118,
+    "dist2": 1766,
+    "sun_min": 15.98,
+    "total": 811
+   },
+   {
+    "name": "日之出町第二公園",
+    "move": 122,
+    "dist2": 1759,
+    "sun_min": 15.73,
+    "total": 865
+   },
+   {
+    "name": "日之出町公園",
+    "move": 123,
+    "dist2": 1837,
+    "sun_min": 13.11,
+    "total": 853
+   },
+   {
+    "name": "西池袋公園",
+    "move": 124,
+    "dist2": 1871,
+    "sun_min": 13.96,
+    "total": 841
+   },
+   {
+    "name": "上り屋敷公園",
+    "move": 144,
+    "dist2": 2183,
+    "sun_min": 17.93,
+    "total": 882
+   },
+   {
+    "name": "雑司が谷みみずく公園",
+    "move": 146,
+    "dist2": 2129,
+    "sun_min": 21.9,
+    "total": 849
+   },
+   {
+    "name": "上池袋公園",
+    "move": 153,
+    "dist2": 2203,
+    "sun_min": 21.37,
+    "total": 896
+   },
+   {
+    "name": "南池袋第二公園",
+    "move": 156,
+    "dist2": 2335,
+    "sun_min": 21.85,
+    "total": 871
+   },
+   {
+    "name": "南池袋みどり公園",
+    "move": 169,
+    "dist2": 2517,
+    "sun_min": 24.7,
+    "total": 884
+   },
+   {
+    "name": "北大塚公園",
+    "move": 210,
+    "dist2": 3097,
+    "sun_min": 26.82,
+    "total": 930
+   },
+   {
+    "name": "西池袋第二公園",
+    "move": 224,
+    "dist2": 3486,
+    "sun_min": 28.51,
+    "total": 921
+   },
+   {
+    "name": "大塚台公園",
+    "move": 226,
+    "dist2": 3374,
+    "sun_min": 27.29,
+    "total": 941
+   },
+   {
+    "name": "池袋の森公園",
+    "move": 240,
+    "dist2": 3334,
+    "sun_min": 40.24,
+    "total": 909
+   },
+   {
+    "name": "池袋ふれあい公園",
+    "move": 248,
+    "dist2": 3538,
+    "sun_min": 41.72,
+    "total": 988
+   },
+   {
+    "name": "池袋第二公園",
+    "move": 258,
+    "dist2": 3928,
+    "sun_min": 33.25,
+    "total": 987
+   },
+   {
+    "name": "椎名町公園",
+    "move": 293,
+    "dist2": 4359,
+    "sun_min": 43.98,
+    "total": 1027
+   },
+   {
+    "name": "千早第二公園",
+    "move": 298,
+    "dist2": 4702,
+    "sun_min": 34.23,
+    "total": 1010
+   },
+   {
+    "name": "千早フラワー公園",
+    "move": 328,
+    "dist2": 4883,
+    "sun_min": 47.29,
+    "total": 1061
+   }
+  ]
+ },
+ "14": {
+  "rho_move_dist": 0.997,
+  "rho_move_sun": 0.9506,
+  "rho_total_sun": 0.8953,
+  "n": 23,
+  "swaps": 6,
+  "best": {
+   "move": "池袋駅前公園",
+   "dist": "池袋駅前公園",
+   "sun": "池袋駅前公園",
+   "total": "東池袋中央公園"
+  },
+  "by_move": [
+   {
+    "name": "池袋駅前公園",
+    "move": 27,
+    "dist2": 540,
+    "sun_min": 0.9,
+    "total": 739
+   },
+   {
+    "name": "南池袋公園",
+    "move": 38,
+    "dist2": 575,
+    "sun_min": 3.65,
+    "total": 774
+   },
+   {
+    "name": "中池袋公園",
+    "move": 65,
+    "dist2": 993,
+    "sun_min": 6.42,
+    "total": 747
+   },
+   {
+    "name": "東池袋公園",
+    "move": 99,
+    "dist2": 1456,
+    "sun_min": 10.87,
+    "total": 781
+   },
+   {
+    "name": "池袋西口公園",
+    "move": 103,
+    "dist2": 1761,
+    "sun_min": 7.47,
+    "total": 767
+   },
+   {
+    "name": "日之出町第二公園",
+    "move": 110,
+    "dist2": 1759,
+    "sun_min": 8.6,
+    "total": 821
+   },
+   {
+    "name": "東池袋中央公園",
+    "move": 111,
+    "dist2": 1853,
+    "sun_min": 6.65,
+    "total": 710
+   },
+   {
+    "name": "日之出町公園",
+    "move": 112,
+    "dist2": 1854,
+    "sun_min": 6.99,
+    "total": 813
+   },
+   {
+    "name": "西池袋公園",
+    "move": 118,
+    "dist2": 1871,
+    "sun_min": 10.17,
+    "total": 808
+   },
+   {
+    "name": "上池袋公園",
+    "move": 131,
+    "dist2": 2109,
+    "sun_min": 15.1,
+    "total": 874
+   },
+   {
+    "name": "雑司が谷みみずく公園",
+    "move": 134,
+    "dist2": 2129,
+    "sun_min": 15.11,
+    "total": 824
+   },
+   {
+    "name": "上り屋敷公園",
+    "move": 134,
+    "dist2": 2183,
+    "sun_min": 12.37,
+    "total": 870
+   },
+   {
+    "name": "南池袋第二公園",
+    "move": 146,
+    "dist2": 2335,
+    "sun_min": 16.5,
+    "total": 846
+   },
+   {
+    "name": "南池袋みどり公園",
+    "move": 160,
+    "dist2": 2517,
+    "sun_min": 19.54,
+    "total": 860
+   },
+   {
+    "name": "北大塚公園",
+    "move": 198,
+    "dist2": 3088,
+    "sun_min": 21.52,
+    "total": 903
+   },
+   {
+    "name": "大塚台公園",
+    "move": 209,
+    "dist2": 3364,
+    "sun_min": 19.02,
+    "total": 907
+   },
+   {
+    "name": "池袋の森公園",
+    "move": 220,
+    "dist2": 3342,
+    "sun_min": 29.99,
+    "total": 841
+   },
+   {
+    "name": "西池袋第二公園",
+    "move": 225,
+    "dist2": 3486,
+    "sun_min": 29.03,
+    "total": 954
+   },
+   {
+    "name": "池袋ふれあい公園",
+    "move": 229,
+    "dist2": 3533,
+    "sun_min": 31.14,
+    "total": 950
+   },
+   {
+    "name": "池袋第二公園",
+    "move": 235,
+    "dist2": 3928,
+    "sun_min": 20.15,
+    "total": 961
+   },
+   {
+    "name": "千早第二公園",
+    "move": 277,
+    "dist2": 4702,
+    "sun_min": 21.95,
+    "total": 969
+   },
+   {
+    "name": "椎名町公園",
+    "move": 289,
+    "dist2": 4363,
+    "sun_min": 40.36,
+    "total": 1011
+   },
+   {
+    "name": "千早フラワー公園",
+    "move": 324,
+    "dist2": 4883,
+    "sun_min": 45.12,
+    "total": 1054
+   }
+  ]
+ },
+ "16": {
+  "rho_move_dist": 0.9911,
+  "rho_move_sun": 0.8762,
+  "rho_total_sun": 0.7255,
+  "n": 23,
+  "swaps": 12,
+  "best": {
+   "move": "池袋駅前公園",
+   "dist": "池袋駅前公園",
+   "sun": "南池袋公園",
+   "total": "中池袋公園"
+  },
+  "by_move": [
+   {
+    "name": "池袋駅前公園",
+    "move": 28,
+    "dist2": 540,
+    "sun_min": 1.4,
+    "total": 706
+   },
+   {
+    "name": "南池袋公園",
+    "move": 32,
+    "dist2": 575,
+    "sun_min": 0.07,
+    "total": 621
+   },
+   {
+    "name": "中池袋公園",
+    "move": 60,
+    "dist2": 1193,
+    "sun_min": 0.49,
+    "total": 501
+   },
+   {
+    "name": "東池袋公園",
+    "move": 87,
+    "dist2": 1531,
+    "sun_min": 3.15,
+    "total": 577
+   },
+   {
+    "name": "池袋西口公園",
+    "move": 94,
+    "dist2": 1762,
+    "sun_min": 3.45,
+    "total": 663
+   },
+   {
+    "name": "日之出町第二公園",
+    "move": 100,
+    "dist2": 1759,
+    "sun_min": 2.77,
+    "total": 690
+   },
+   {
+    "name": "東池袋中央公園",
+    "move": 100,
+    "dist2": 1805,
+    "sun_min": 2.88,
+    "total": 599
+   },
+   {
+    "name": "日之出町公園",
+    "move": 100,
+    "dist2": 1806,
+    "sun_min": 2.88,
+    "total": 690
+   },
+   {
+    "name": "西池袋公園",
+    "move": 108,
+    "dist2": 1799,
+    "sun_min": 8.87,
+    "total": 685
+   },
+   {
+    "name": "上池袋公園",
+    "move": 111,
+    "dist2": 2109,
+    "sun_min": 3.45,
+    "total": 814
+   },
+   {
+    "name": "雑司が谷みみずく公園",
+    "move": 116,
+    "dist2": 2129,
+    "sun_min": 4.76,
+    "total": 750
+   },
+   {
+    "name": "上り屋敷公園",
+    "move": 125,
+    "dist2": 2247,
+    "sun_min": 6.19,
+    "total": 817
+   },
+   {
+    "name": "南池袋第二公園",
+    "move": 134,
+    "dist2": 2335,
+    "sun_min": 8.94,
+    "total": 804
+   },
+   {
+    "name": "南池袋みどり公園",
+    "move": 147,
+    "dist2": 2517,
+    "sun_min": 11.6,
+    "total": 817
+   },
+   {
+    "name": "北大塚公園",
+    "move": 169,
+    "dist2": 3088,
+    "sun_min": 4.65,
+    "total": 778
+   },
+   {
+    "name": "大塚台公園",
+    "move": 180,
+    "dist2": 3364,
+    "sun_min": 2.03,
+    "total": 785
+   },
+   {
+    "name": "池袋の森公園",
+    "move": 199,
+    "dist2": 3340,
+    "sun_min": 17.86,
+    "total": 664
+   },
+   {
+    "name": "池袋ふれあい公園",
+    "move": 213,
+    "dist2": 3602,
+    "sun_min": 19.92,
+    "total": 782
+   },
+   {
+    "name": "池袋第二公園",
+    "move": 220,
+    "dist2": 3897,
+    "sun_min": 12.04,
+    "total": 883
+   },
+   {
+    "name": "西池袋第二公園",
+    "move": 229,
+    "dist2": 3550,
+    "sun_min": 30.58,
+    "total": 962
+   },
+   {
+    "name": "千早第二公園",
+    "move": 272,
+    "dist2": 4671,
+    "sun_min": 19.2,
+    "total": 876
+   },
+   {
+    "name": "椎名町公園",
+    "move": 284,
+    "dist2": 4427,
+    "sun_min": 37.04,
+    "total": 940
+   },
+   {
+    "name": "千早フラワー公園",
+    "move": 312,
+    "dist2": 4917,
+    "sun_min": 38.27,
+    "total": 1005
+   }
+  ]
+ }
+}

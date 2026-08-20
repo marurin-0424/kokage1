@@ -1,0 +1,279 @@
+{
+ "base": 710,
+ "cases": [
+  {
+   "label": "基準",
+   "total": 710,
+   "delta": 0.0
+  },
+  {
+   "label": "歩行速度 35 m/分",
+   "total": 761,
+   "delta": 7.2
+  },
+  {
+   "label": "歩行速度 45 m/分",
+   "total": 728,
+   "delta": 2.5
+  },
+  {
+   "label": "歩行速度 60 m/分",
+   "total": 699,
+   "delta": -1.6
+  },
+  {
+   "label": "歩行速度 70 m/分",
+   "total": 686,
+   "delta": -3.3
+  },
+  {
+   "label": "信号待ち 0 秒",
+   "total": 697,
+   "delta": -1.8
+  },
+  {
+   "label": "信号待ち 15 秒",
+   "total": 704,
+   "delta": -0.9
+  },
+  {
+   "label": "信号待ち 60 秒",
+   "total": 723,
+   "delta": 1.8
+  },
+  {
+   "label": "信号待ち 90 秒",
+   "total": 736,
+   "delta": 3.7
+  },
+  {
+   "label": "遊びの METs 2.8",
+   "total": 400,
+   "delta": -43.6
+  },
+  {
+   "label": "遊びの METs 4.0",
+   "total": 524,
+   "delta": -26.2
+  },
+  {
+   "label": "遊びの METs 5.8",
+   "total": 710,
+   "delta": 0.0
+  },
+  {
+   "label": "遊びの METs 7.0",
+   "total": 834,
+   "delta": 17.5
+  },
+  {
+   "label": "滞在 30 分",
+   "total": 411,
+   "delta": -42.2
+  },
+  {
+   "label": "滞在 45 分",
+   "total": 560,
+   "delta": -21.1
+  },
+  {
+   "label": "滞在 90 分",
+   "total": 1010,
+   "delta": 42.2
+  },
+  {
+   "label": "滞在 120 分",
+   "total": 1309,
+   "delta": 84.4
+  },
+  {
+   "label": "公園の日陰率 0%",
+   "total": 854,
+   "delta": 20.3
+  },
+  {
+   "label": "公園の日陰率 25%",
+   "total": 778,
+   "delta": 9.6
+  },
+  {
+   "label": "公園の日陰率 50%",
+   "total": 703,
+   "delta": -1.1
+  },
+  {
+   "label": "公園の日陰率 75%",
+   "total": 627,
+   "delta": -11.7
+  },
+  {
+   "label": "公園の日陰率 100%",
+   "total": 551,
+   "delta": -22.4
+  },
+  {
+   "label": "WBGT 27",
+   "total": 509,
+   "delta": -28.3
+  },
+  {
+   "label": "WBGT 28",
+   "total": 609,
+   "delta": -14.2
+  },
+  {
+   "label": "WBGT 30",
+   "total": 811,
+   "delta": 14.2
+  },
+  {
+   "label": "WBGT 31",
+   "total": 911,
+   "delta": 28.4
+  },
+  {
+   "label": "体重 12 kg",
+   "total": 612,
+   "delta": -13.8
+  },
+  {
+   "label": "体重 18 kg",
+   "total": 802,
+   "delta": 12.9
+  },
+  {
+   "label": "体重 22 kg",
+   "total": 917,
+   "delta": 29.1
+  },
+  {
+   "label": "くもり係数 f=0.0",
+   "total": 741,
+   "delta": 4.3
+  },
+  {
+   "label": "くもり係数 f=0.3",
+   "total": 731,
+   "delta": 3.0
+  },
+  {
+   "label": "くもり係数 f=0.6",
+   "total": 722,
+   "delta": 1.7
+  }
+ ],
+ "speed_flip": [
+  {
+   "speed": 20,
+   "winner": "池袋駅前公園",
+   "total": 784,
+   "second": "南池袋公園",
+   "gap": 42
+  },
+  {
+   "speed": 25,
+   "winner": "池袋駅前公園",
+   "total": 770,
+   "second": "中池袋公園",
+   "gap": 39
+  },
+  {
+   "speed": 30,
+   "winner": "池袋駅前公園",
+   "total": 760,
+   "second": "東池袋中央公園",
+   "gap": 25
+  },
+  {
+   "speed": 33,
+   "winner": "池袋駅前公園",
+   "total": 756,
+   "second": "東池袋中央公園",
+   "gap": 14
+  },
+  {
+   "speed": 35,
+   "winner": "池袋駅前公園",
+   "total": 753,
+   "second": "東池袋中央公園",
+   "gap": 8
+  },
+  {
+   "speed": 36,
+   "winner": "池袋駅前公園",
+   "total": 752,
+   "second": "東池袋中央公園",
+   "gap": 5
+  },
+  {
+   "speed": 37,
+   "winner": "池袋駅前公園",
+   "total": 751,
+   "second": "東池袋中央公園",
+   "gap": 2
+  },
+  {
+   "speed": 38,
+   "winner": "東池袋中央公園",
+   "total": 749,
+   "second": "池袋駅前公園",
+   "gap": 1
+  },
+  {
+   "speed": 39,
+   "winner": "東池袋中央公園",
+   "total": 746,
+   "second": "池袋駅前公園",
+   "gap": 3
+  },
+  {
+   "speed": 40,
+   "winner": "東池袋中央公園",
+   "total": 742,
+   "second": "池袋駅前公園",
+   "gap": 6
+  },
+  {
+   "speed": 45,
+   "winner": "東池袋中央公園",
+   "total": 728,
+   "second": "池袋駅前公園",
+   "gap": 16
+  },
+  {
+   "speed": 50,
+   "winner": "東池袋中央公園",
+   "total": 716,
+   "second": "池袋駅前公園",
+   "gap": 25
+  },
+  {
+   "speed": 53.1,
+   "winner": "東池袋中央公園",
+   "total": 710,
+   "second": "池袋駅前公園",
+   "gap": 29
+  },
+  {
+   "speed": 60,
+   "winner": "東池袋中央公園",
+   "total": 699,
+   "second": "池袋駅前公園",
+   "gap": 37
+  },
+  {
+   "speed": 70,
+   "winner": "東池袋中央公園",
+   "total": 686,
+   "second": "池袋駅前公園",
+   "gap": 46
+  },
+  {
+   "speed": 80,
+   "winner": "東池袋中央公園",
+   "total": 677,
+   "second": "中池袋公園",
+   "gap": 51
+  }
+ ]
+}

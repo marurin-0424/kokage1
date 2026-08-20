@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<title>こかげ — 今日、どこへ連れて行くか</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="夏の午後、3〜5歳を連れてどこで遊ばせるか。建物と高架の影から道の日陰を計算し、行き先を1つ出します。">
+<style>
+:root{--surface:#fcfcfb;--plane:#f4f4f1;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+ --hair:#e1e0d9;--ring:rgba(11,11,11,.10);--sun:#eb6834;--shade:#2a78d6}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--plane);color:var(--ink);
+ font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;font-size:16px;line-height:1.65}
+.wrap{max-width:760px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:32px;margin:16px 0 4px;letter-spacing:.05em}
+.tag{font-size:15px;color:var(--ink2);margin:0 0 22px}
+.lead{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:18px 20px;margin-bottom:26px}
+.lead p{margin:0 0 8px}
+.lead p:last-child{margin:0}
+b{color:var(--ink)}
+a.card{display:block;background:var(--surface);border:1px solid var(--hair);border-radius:14px;
+ padding:18px 20px;margin-bottom:14px;text-decoration:none;color:inherit;transition:border-color .15s}
+a.card:hover{border-color:var(--ink)}
+a.card .t{font-size:19px;font-weight:800;margin-bottom:4px}
+a.card .d{font-size:14px;color:var(--ink2)}
+a.card .m{font-size:12.5px;color:var(--muted);margin-top:8px}
+h2{font-size:17px;margin:32px 0 10px;padding-top:20px;border-top:1px solid var(--hair)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--surface);
+ border:1px solid var(--hair);border-radius:10px;overflow:hidden}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--hair);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px;width:11em}
+tr:last-child td,tr:last-child th{border-bottom:0}
+.note{font-size:13px;color:var(--ink2)}
+.warn{background:#fff8e8;border:1px solid #f0dca8;border-radius:10px;padding:12px 15px;font-size:14px;margin:14px 0}
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--hair);font-size:12px;color:var(--muted);line-height:1.7}
+</style></head>
+<body><div class="wrap">
+
+<h1>こかげ</h1>
+<p class="tag">建物の影から、子連れの夏の外出を変える。</p>
+
+<div class="lead">
+<p><b>親は、勘で決めて後悔しています。</b>行ってみたら暑すぎて15分で撤退した、という日が夏には何度もあります。</p>
+<p>こかげは<b>行き先を決めません。決めるための材料を、順に出します。</b>
+① 今日行けるか（暑さ指数31以上なら屋外を出さない）→ ② 何時に出るか（11〜16時の6枚）→ ③ どこへ行くか（候補3件を<b>公園の影の形</b>とあわせて）→ ④ どの道で行くか。</p>
+<p><b>④だけは、こかげが決めます。</b>1.8% の遠回りで、往復の日なたが中央値で 31% 減ります（14時・n=400）。道路の<b>どちら側の歩道</b>を歩くかまで出します。</p>
+</div>
+
+<a class="card" href="./kokage-v1b-mobile.html">
+  <div class="t">こかげ（画面 v1b ／ スマホ）→　★ こちらが最新です</div>
+  <div class="d">4ステップ。時刻を切り替えると、公園の影の形と必要な水分量が同時に変わります。
+  ①は暑さ指数の目盛り、④は日なた／日陰を色分けした地図です。</div>
+  <div class="m">池袋駅東口／暑さ指数29.0／滞在60分／体重15kg で固定｜11〜16時の6枚｜行き先3件</div>
+</a>
+
+<a class="card" href="./kokage-v1-mobile.html">
+  <div class="t">こかげ（画面 v1 ／ スマホ）→</div>
+  <div class="d">v1b の1つ前。①が文字4ブロック、④に地図がありません。差分の比較用に置いてあります。</div>
+  <div class="m">2026-08-17 版</div>
+</a>
+
+<a class="card" href="./kokage-v0-mobile.html">
+  <div class="t">こかげ（画面 v0.1 ／ スマホ）→</div>
+  <div class="d">旧版。入力画面から「行き先を出す」を押すと結果が出ます。1位〜3位を並べます。</div>
+  <div class="m">幅390px基準｜出発地3｜12:00 ↔ 14:00｜WBGT 29 ↔ 31.5</div>
+</a>
+
+<a class="card" href="./kokage-v0.html">
+  <div class="t">こかげ（画面 v0 ／ PC）→</div>
+  <div class="d">旧版。地図には建物の影・高架の影・経路の日なた/日陰が出ます。</div>
+  <div class="m">都電雑司ヶ谷駅／池袋駅東口／地下鉄 雑司が谷駅｜12:00 ↔ 14:00｜WBGT 29 ↔ 31.5</div>
+</a>
+
+<a class="card" href="./walk-timer.html">
+  <div class="t">歩行速度メジャー →</div>
+  <div class="d">3〜5歳を連れた実際の分速を測ります。「歩く／止まる／信号待ち」の3ボタンを押すだけ。</div>
+  <div class="m">スマホ向け。共有 → ホーム画面に追加 でアプリのように使えます</div>
+</a>
+
+<div class="warn">
+<b>これは開発中のプロトタイプです。</b>数値は公開データからの<b>推定値</b>であり、医学的な判断ではありません。
+お子様の様子を見て、のどの渇きに応じて自由に飲めるようにしてください。
+</div>
+
+<h2>いま答えられる範囲</h2>
+<table>
+<tr><th>範囲</th><td><b>池袋駅周辺 約2.5km × 1.1km</b>（歩行空間ネットワークの収録範囲）</td></tr>
+<tr><th>できること</th><td>建物と高架の影／どちら側の歩道か／段差・幅員・階段／横断歩道と信号待ち／曇りの日は日陰の重み付けを自動で外す</td></tr>
+<tr><th>できないこと</th><td>収録範囲の外では答えを出せません。<b>地下鉄の雑司が谷駅からは、歩いて3分の雑司が谷公園にも答えられません。</b>歩行空間ネットワークが整備されているのは都内17地区だけだからです</td></tr>
+</table>
+
+<h2>使っているオープンデータ</h2>
+<p class="note">いずれも<b>加工して利用</b>しています（影の計算・座標の突合）。</p>
+<table>
+<tr><th>建物・橋梁・地盤高</th><td>東京都3Dデジタルマップ（3D都市モデル 豊島区 2025年度版）／ <b>東京都</b> ／ CC BY 4.0</td></tr>
+<tr><th>歩行者ネットワーク</th><td>歩行空間ネットワークデータ（池袋駅周辺）／ 国土交通省 ／ 公共データ利用規約（第1.0版）</td></tr>
+<tr><th>公園・駅・施設</th><td>公共施設一覧 ／ 豊島区 ／ <b>CC BY 2.1 日本</b></td></tr>
+<tr><th>授乳・おむつ替え</th><td>赤ちゃん・ふらっと一覧 ／ 東京都福祉局 ／ CC BY 4.0</td></tr>
+<tr><th>暑さ指数</th><td>熱中症予防情報（暑さ指数WBGT）／ 環境省 ／ 公共データ利用規約（第1.0版）</td></tr>
+</table>
+<p class="note">このほか、<b>検証にのみ</b>次の4件を使いました（作品には組み込んでいません）：都道の街路樹（東京都建設局／CC BY 4.0）／アメダス観測データ（気象庁／公共データ利用規約 第1.0版）／緑のオープンデータ GISデータ（東京都都市整備局）／都営バス GTFS-JP（東京都交通局／CC BY 4.0）。</p>
+
+<h2>作っていて分かったこと</h2>
+<table>
+<tr><th>今ないデータ</th><td>公園の遊具は、東京都のオープンデータカタログ<b>9,656件のデータセットの中に1件もありません</b>（2026年8月時点）。施設のバリアフリー情報は豊島区558件に列はあるが<b>1件も入っていない</b>。歩行者ネットワーク2,196リンクで<b>エレベーターありは0本</b></td></tr>
+<tr><th>出ているのに足りないデータ</th><td>東京都は2026年1月に<b>「緑のオープンデータ」を14レイヤ公開</b>しましたが、樹林地は<b>公園の開園区域を対象外</b>にしています。公園の中のどこに木が立っているかは、いまも分かりません</td></tr>
+<tr><th>足りない範囲</th><td>同じ「雑司が谷」で、<b>都電の駅は収録範囲まで8m、地下鉄の駅は442m。2駅は463mしか離れていない</b></td></tr>
+</table>
+
+<footer>
+こかげ ／ 都知事杯オープンデータ・ハッカソン2026 応募作品（開発中）<br>
+データ：東京都3Dデジタルマップ（PLATEAU仕様）豊島区2025 建築物・橋梁（東京都／CC BY 4.0）／歩行空間ネットワークデータ 池袋駅周辺（国土交通省／公共データ利用規約（第1.0版））／
+豊島区 公共施設一覧・都市公園（豊島区）／赤ちゃん・ふらっと一覧（東京都福祉局／CC BY 4.0）／都道の街路樹（東京都建設局）／暑さ指数WBGT（環境省）／アメダス（気象庁）。<br>
+日影は <b>2026年8月12日</b>の太陽位置による計算値で、<b>晴天時の値</b>です。曇りの日の補正は入っていません。<br>公園の日陰には<b>樹木が含まれていません</b>（建物と高架の影のみ）。現地確認では、実際より 9〜32 ポイント少なく見ていました。
+</footer>
+</div></body></html>

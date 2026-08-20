@@ -1,0 +1,87 @@
+[
+ {
+  "hour": 9,
+  "alt": 47.6,
+  "az": 108.3,
+  "base": 0.5072,
+  "withtree": 0.5139,
+  "gain_pt": 0.67,
+  "links_up": 43,
+  "links_up20": 18,
+  "max_gain": 100.0
+ },
+ {
+  "hour": 10,
+  "alt": 58.5,
+  "az": 124.2,
+  "base": 0.3933,
+  "withtree": 0.4037,
+  "gain_pt": 1.04,
+  "links_up": 55,
+  "links_up20": 26,
+  "max_gain": 100.0
+ },
+ {
+  "hour": 12,
+  "alt": 69.0,
+  "az": 189.3,
+  "base": 0.2905,
+  "withtree": 0.3004,
+  "gain_pt": 0.99,
+  "links_up": 58,
+  "links_up20": 21,
+  "max_gain": 100.0
+ },
+ {
+  "hour": 14,
+  "alt": 53.6,
+  "az": 243.9,
+  "base": 0.4872,
+  "withtree": 0.4918,
+  "gain_pt": 0.46,
+  "links_up": 48,
+  "links_up20": 14,
+  "max_gain": 66.7
+ },
+ {
+  "hour": 16,
+  "alt": 30.1,
+  "az": 267.1,
+  "base": 0.673,
+  "withtree": 0.6758,
+  "gain_pt": 0.28,
+  "links_up": 24,
+  "links_up20": 12,
+  "max_gain": 46.2
+ },
+ {
+  "note": "樹冠半径の感度（14:00）",
+  "x1": 49.2,
+  "x15": 49.8,
+  "x2": 50.6,
+  "x3": 52.7,
+  "base": 48.7
+ },
+ {
+  "note": "街路樹が10m以内にあるリンク",
+  "links": 399,
+  "of": 2196,
+  "pct_len": 23.2,
+  "trees_bbox": 7799,
+  "trees_near_10m": 1121
+ },
+ {
+  "note": "14:00 街路樹があるリンクだけ",
+  "base": 42.6,
+  "withtree": 44.6,
+  "gain_pt": 2.0
+ },
+ {
+  "note": "行き先への影響（都電雑司ヶ谷駅14:00・2026-08-12夜 再実行）",
+  "top_no_tree": "南池袋みどり公園 679mL",
+  "top_with_tree": "南池袋みどり公園 679mL",
+  "parks": 19,
+  "reordered": 0,
+  "max_delta_ml": -34.1
+ }
+]
