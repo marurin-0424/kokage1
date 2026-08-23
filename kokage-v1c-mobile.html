@@ -1,0 +1,1463 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>こかげ — 今日、どこへ連れて行くか</title>
+<style>
+:root{--surface:#fcfcfb;--plane:#f4f4f1;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+--hair:#e1e0d9;--sun:#eb6834;--shade:#2a78d6;--deck:#4a3aa7;--park:#1baf7a;
+--warning:#fab219;--critical:#d03b3b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--ink);
+font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;
+line-height:1.7;-webkit-text-size-adjust:100%}
+.wrap{max-width:430px;margin:0 auto;padding:0 16px 56px}
+header{padding:20px 0 10px}
+.logo{font-size:20px;font-weight:700;letter-spacing:.04em}
+.tag{font-size:12px;color:var(--muted);margin-top:2px}
+.step{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:16px;margin:14px 0}
+.no{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--ink);
+border-radius:999px;padding:2px 9px;margin-bottom:8px;letter-spacing:.06em}
+h2{font-size:17px;margin:0 0 4px}
+.lead{font-size:13px;color:var(--ink2);margin:0 0 12px}
+.note{font-size:11.5px;color:var(--muted);line-height:1.6;margin:10px 0 0}
+.warn{background:#fff8e6;border:1px solid var(--warning);border-radius:10px;padding:10px 12px;font-size:13px;margin:0 0 12px}
+.crit{background:#fdecec;border:1px solid var(--critical);border-radius:10px;padding:10px 12px;font-size:13px;margin:0 0 12px;color:#8a1c1c}
+
+/* 出発地バー */
+.orig{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:12px 14px;margin:10px 0 0}
+.orig .r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.orig .lb{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em}
+.orig .who{font-size:13px;color:var(--ink2);flex:1;min-width:100%}
+button{font:inherit;padding:7px 12px;border:1.5px solid var(--hair);background:#fff;border-radius:9px;cursor:pointer;color:var(--ink)}
+button.on{background:var(--park);color:#fff;border-color:var(--park)}
+button:disabled{opacity:.5}
+canvas{width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--hair);background:#fff;touch-action:manipulation}
+.pickwrap{margin-top:10px}
+.hidden{display:none}
+
+/* ① ゲート
+   ★ 2026-08-22：見出しを「今日、行けるか」から「今日、行ける時刻はあるか」に変えた。
+     時刻ごとの暑さ指数を入れた結果、①が13時の値だけを見て「今日は外出を避けて」と
+     言い切る一方、②には出られる時刻が並ぶ、という食い違いが出ていたため。
+     21〜35のゲージ（.gauge/.gtick）は捨てず、スライダーと一緒に details の中へ移した。 */
+.tl{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin:10px 0 0}
+.tl div{height:38px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+font-size:12px;font-weight:700;color:#fff;letter-spacing:.02em}
+.tlx{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;font-size:10.5px;color:var(--muted);
+text-align:center;margin-top:3px;line-height:1.35}
+.lg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--ink2);margin-top:8px}
+.lg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+/* ★ .r は .orig の中でしか効いていなかったので、①のボタン2つが縦に積まれていた */
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btnrow button{flex:1;min-width:0;font-size:12.5px;padding:8px 6px;white-space:nowrap}
+.gauge{height:16px;border-radius:5px;overflow:hidden;display:flex;margin:6px 0 4px}
+.gauge i{display:block;height:16px}
+.gtick{position:relative;height:16px;font-size:10px;color:var(--muted)}
+.gtick b{position:absolute;transform:translateX(-50%);color:var(--ink);font-size:11px}
+.wrow{display:flex;gap:8px;align-items:center;margin:10px 0 0}
+input[type=range]{flex:1;min-width:120px}
+.wv{font-variant-numeric:tabular-nums;font-weight:700;font-size:18px;min-width:52px;text-align:right}
+
+/* ② 時刻
+   ★ 2026-08-22：バッジを列から外してバーの上に積む。
+     以前は 44px/auto/1fr/100px/13px の5列で、バッジの文字数ぶんバーが縮み、
+     「31以上・行き先を出しません」が出た時刻だけバーが半分になって、
+     日陰率を時刻どうしで比べられなくなっていた。 */
+.hours{display:grid;grid-template-columns:1fr;gap:6px}
+.hr{display:grid;grid-template-columns:42px 1fr 124px 13px;align-items:center;gap:10px;
+border:1.5px solid var(--hair);background:var(--surface);border-radius:11px;padding:9px 11px;
+text-align:left;cursor:pointer;font:inherit;transition:.12s;width:100%}
+.hr[aria-pressed=true]{border-color:var(--park);background:#f2fbf7}
+.hr.dim{background:var(--plane);border-color:#e7e6e0;opacity:.72}
+.hr.dim[aria-pressed=true]{border-color:var(--park);opacity:1}
+.hr .t{font-size:16px;font-weight:700}
+.hr .s{font-size:11px;color:var(--ink2);line-height:1.5;text-align:right;font-variant-numeric:tabular-nums}
+.hr .s b{color:var(--ink)}
+/* ★ 2026-08-23：何を基準に選ぶかを見えるようにするため、発汗量目安を主役にした。
+   日陰率の数字は消してバーだけにする（バーが日陰率そのものなので二重になっていた）。 */
+.hr .s .ml{display:block;font-size:19px;font-weight:700;color:var(--ink);line-height:1.15}
+.hr .s .ml i{font-size:12px;font-weight:700;font-style:normal;margin-left:1px}
+.hr .s .sub{display:block;font-size:10.5px;color:var(--muted);line-height:1.5}
+
+.hr .ch{font-size:19px;color:var(--muted);text-align:right;line-height:1}
+.hr[aria-pressed=true] .ch{color:var(--park)}
+.hr .mid{display:block;min-width:0}
+.hr .bar{display:block;height:11px;border-radius:4px;background:var(--sun);overflow:hidden}
+.hr .bar i{display:block;height:11px;background:var(--shade);border-radius:4px 0 0 4px}
+/* ★ バッジが無い行でも高さを空けておく。空けないと、バッジのある行だけバーが下がって
+   6本のバーが同じ高さに並ばなくなる。行の高さは右の3行（日陰・暑さ・mL）が決めているので、
+   ここを空けても行は高くならない。 */
+.bd{display:block;min-width:0;margin-bottom:3px;font-size:10px;line-height:1.4;min-height:16px}
+.badge{display:inline-block;margin:0 2px 0 0;font-size:10px;font-weight:700;color:#fff;background:var(--park);
+border-radius:999px;padding:1px 7px;line-height:1.4;white-space:nowrap}
+.badge.bad{background:var(--sun)}
+.badge.gate{background:var(--critical)}
+.badge.gray{background:#a9a7a1}
+/* ★ 2026-08-22：①②を畳んだので、暑さ指数の色は行の左端のチップで表す */
+.hr{position:relative;overflow:hidden}
+.hr .chip{position:absolute;left:0;top:0;bottom:0;width:5px}
+.badge.warn{background:#f2c94c;color:#5a4300}
+button.wide{width:100%;padding:12px;font-size:14px;font-weight:700;
+background:var(--park);color:#fff;border-color:var(--park)}
+.wsrc{font-size:12px;color:var(--ink2);background:var(--plane);border-radius:8px;
+padding:7px 10px;margin:10px 0 0;line-height:1.55}
+.wsrc b{color:var(--ink)}
+.worse{font-size:12.5px;color:#7a4a1a;background:#fff5ec;border-radius:9px;
+padding:8px 11px;margin:12px 0 0;line-height:1.6}
+.worse b{color:#5c3512}
+.delta{font-size:13px;color:var(--ink2);margin:12px 0 0;padding-top:10px;border-top:1px dashed var(--hair)}
+.delta b{color:var(--ink)}
+.earliest{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--ink2);margin:0 0 10px}
+select{font:inherit;padding:5px 8px;border:1.5px solid var(--hair);border-radius:8px;background:#fff}
+
+/* ③ 行き先 */
+.cards{display:flex;flex-direction:column;gap:10px}
+.card{border:1.5px solid var(--hair);border-radius:12px;overflow:hidden;background:var(--surface);
+cursor:pointer;text-align:left;font:inherit;width:100%;padding:0}
+.card[aria-pressed=true]{border-color:var(--park)}
+.card figure{margin:0;background:#fff;border-bottom:1px solid var(--hair)}
+.card .body{padding:10px 12px}
+.card .nm{font-size:16px;font-weight:700}
+.card .mt{font-size:12px;color:var(--ink2)}
+.card .ml{font-size:13px;margin-top:2px}
+.card .ml b{font-size:17px}
+.hrs{margin-top:6px;font-size:12px;background:#f2fbf7;border-radius:8px;padding:7px 9px;line-height:1.55}
+.hrs b{font-size:14px}
+.hrs.none{background:#fff8e6;color:#7a5800}
+.hrs .hsrc{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+
+/* ④ 道 */
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--ink2);margin-top:8px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.steps{list-style:none;padding:0;margin:12px 0 0;font-size:13px}
+.steps li{display:grid;grid-template-columns:64px 1fr;gap:8px;padding:6px 0;border-bottom:1px dashed var(--hair)}
+.steps .d{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px}
+.steps .x{color:var(--sun);font-weight:700}
+.steps .o{color:var(--shade);font-weight:700}
+.gmap{display:block;margin-top:12px;padding:10px 12px;border-radius:9px;background:#fff;
+border:1.5px solid var(--hair);text-align:center;font-size:13.5px;color:var(--ink);text-decoration:none}
+.disc{background:#fff8e6;border:1px solid var(--warning);border-radius:12px;padding:12px 14px;font-size:12.5px;margin:14px 0}
+details{background:var(--surface);border:1px solid var(--hair);border-radius:12px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertical-align:top}
+.boot{background:#fff8e6;border:1px solid var(--warning);border-radius:12px;padding:12px 14px;font-size:13px;margin:14px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">こ<b style="color:var(--park)">か</b>げ</div>
+  <div class="tag">建物の影から、子連れの外出をすこし楽にする</div>
+</header>
+
+<div id="boot" class="boot hidden"></div>
+
+<div class="orig">
+  <div class="r">
+    <span class="lb">どこから出ますか</span>
+  </div>
+  <div class="r" style="margin-top:6px">
+    <button id="geo">現在地</button>
+    <button id="pickBtn">地図から選ぶ</button>
+  </div>
+  <div class="who" id="originLabel">池袋駅東口</div>
+  <div id="outside" class="crit hidden"></div>
+  <div class="pickwrap hidden" id="pickWrap">
+    <canvas id="pickMap" width="720" height="480"></canvas>
+    <p class="note">タップで出発地、ドラッグで移動、ピンチ／ホイールで拡大縮小、ダブルタップで元に戻ります。白く伏せた外側は計算できません（歩行空間ネットワークから200mまで）。灰色は建物、青灰色の線は歩ける道です。</p>
+  </div>
+
+  <!-- ★ 2026-08-23：条件の順番を「どこから→どこで→どんな遊び方→どれくらい遊ぶ→体重」に並べ替え、
+       プルダウンをやめてワンタップのチップにした（玄関で片手・数十秒で決める画面のため）。
+       体重だけは刻みが11段あってチップにすると並びすぎるので、数値入力のまま。 -->
+  <div class="fld">
+    <span class="lb">どこで遊びたいですか</span>
+    <div class="chips" id="chipPlace" data-k="place">
+      <button class="chip on" data-v="out">できれば屋外</button>
+      <button class="chip" data-v="in">屋内</button>
+    </div>
+  </div>
+
+  <div class="fld">
+    <span class="lb">どんな遊び方ですか</span>
+    <div class="chips" id="chipMets" data-k="mets">
+      <button class="chip" data-v="5.80">ずっと走る</button>
+      <button class="chip on" data-v="4.90">走り回る中心</button>
+      <button class="chip" data-v="4.00">半々</button>
+      <button class="chip" data-v="3.10">座って遊ぶ中心</button>
+      <button class="chip" data-v="2.20">ほとんど座る</button>
+    </div>
+    <span class="note" style="margin:4px 0 0">走っている割合 100／75／50／25／0%</span>
+  </div>
+
+  <div class="fld">
+    <span class="lb">どれくらい遊びますか</span>
+    <div class="chips" id="chipStay" data-k="stay">
+      <button class="chip" data-v="30">30分</button>
+      <button class="chip" data-v="45">45分</button>
+      <button class="chip on" data-v="60">60分</button>
+      <button class="chip" data-v="90">90分</button>
+      <button class="chip" data-v="120">120分</button>
+    </div>
+    <span class="note" style="margin:4px 0 0">着いてからの滞在時間です</span>
+  </div>
+
+  <div class="fld">
+    <span class="lb">お子様の体重</span>
+    <div class="r">
+      <input id="bw" type="number" min="12" max="22" step="0.5" value="15"
+             inputmode="decimal">
+      <span class="note" style="margin:0">kg（12〜22。3〜5歳の範囲です）</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ★ 2026-08-22：①と②を1つに畳んだ（4ステップ → 3ステップ）。
+     同じ6時刻の暑さ指数を①の帯と②の行で2回描いていたため。
+     暑さの色は各行の左端の5pxチップに移し、28以上には黄バッジを足した。
+     ★ 全時刻ゲートの日は、6行を畳んで「屋内を見る」だけ出す（言い切りの強さを保つため）。 -->
+<section class="step" id="step1"><span class="no">1／いつ出かけるか</span>
+  <h2 id="gateH">今日は出かけられます。</h2>
+  <div id="gateBox"></div>
+  <p class="lead" id="gateLead" style="margin:0 0 10px"></p>
+
+  <!-- 全時刻31以上のときだけ出す。6行の代わり -->
+  <div id="allGateBox" class="hidden">
+    <button id="toIndoor" class="wide">日陰を通って行ける屋内の遊び場を探す</button>
+    <p class="note">それでも時刻ごとの数字を見たい場合は、下の「6時刻を表示する」を開いてください。</p>
+    <details id="forceHours"><summary>6時刻を表示する</summary></details>
+  </div>
+
+  <div id="hoursWrap">
+    <div class="hours" id="hours"></div>
+    <div class="lg" style="margin-top:10px">
+      <span><i style="background:#79c9a3"></i>28未満</span>
+      <span><i style="background:#f2c94c"></i>28以上（子どもは外出を避けたい）</span>
+      <span><i style="background:#d03b3b"></i>31以上（大人でも避けたい）</span>
+    </div>
+    <p class="worse hidden" id="worse"></p>
+    <p class="note">左端の色が、その時刻の暑さ指数です。バーは周囲400mの歩道の日陰率。</p>
+    <!-- ★ 2026-08-23：一部の時刻だけ31以上の日の入口。
+         その時刻の行は数字を出さない（屋外の目安が無いため）ので、
+         「屋内なら何時か」を比べたい人をワンタップで屋内モードへ送る。
+         全時刻31以上のときは上の #allGateBox 側に同じ入口がある。 -->
+    <button id="toIndoorPartial" class="wide hidden"></button>
+  </div>
+
+  <!-- ★ 2026-08-23：ボタン2つを畳んだ。既定が「今日の実況＋予測」になったので、
+       「今日の予測で時刻ごとに」は押すボタンではなく“いまの状態”になり、
+       「いまの暑さ指数を取り込む」は予測既定なら出番がほぼ無い。
+       状態を1行で見せ、戻すのは小さいリンク、実況の取り込みは details の中へ移した。 -->
+  <p class="wsrc" id="fcSrc"></p>
+  <p class="note" id="liveSrc"></p>
+  <details><summary>暑さ指数を自分で決める</summary>
+    <div class="r" style="margin-top:8px">
+      <button id="live">いまの実況値を取り込む</button>
+      <button id="fc">去年8月の平均に戻す</button>
+    </div>
+    <div class="gauge" id="gauge"></div>
+    <div class="gtick" id="gtick"></div>
+    <div class="wrow">
+      <input id="wbgt" type="range" min="21" max="35" step="0.1" value="29">
+      <span class="wv" id="wbgtV">29.0</span>
+    </div>
+    <p class="note" id="wbgtSrc">動かすのは13時の値です。6時刻すべてが同じだけ動き、下がすべて計算し直されます。</p>
+  </details>
+  <details><summary>暑さ指数の線の出典</summary>
+
+    <p class="note">日本生気象学会「日常生活における熱中症予防指針 Ver.4」<b>p.3</b>：危険（31℃以上）の注意事項は「高齢者においては安静状態でも発生する危険性が大きい．<b>外出はなるべく避け，涼しい室内に移動する．</b>」。同 <b>p.12-13</b>：「幼児・学童」には「<b>一つ上の温度基準域の『注意事項』を適用する</b>」＝28以上の子どもには、この一文が当たります。同 p.12：「厳重警戒以上の温度基準域（WBGT28℃以上）では，不要な外出，屋外での作業などは控える．」／日本スポーツ協会「熱中症予防運動指針」第6版 p.15：31以上は「運動は原則中止」「特に子どもの場合には中止すべき」。<br>★ 画面の「大人でも」「子どもは」という言い方は、上の2つを子連れの場面に言い換えたものです。原文にこの語はありません。環境省の指針ではありません。</p>
+  </details>
+</section>
+
+<section class="step" id="step2"><span class="no">2／どこへ行くか</span>
+  <h2 id="h3">どこに行きますか？</h2>
+  <p class="lead" id="lead3">往復と滞在で失われる水分量が少ないと推測される順に、3つご提案します。お子様が日陰で遊んでくれそうか、どこが影になるかを見てみてください。</p>
+  <div class="cards" id="cards"></div>
+  <p class="note" id="n3">★ 図の青は建物と高架の影です。樹木の影は入っていません。公園の日陰は実際には樹木が作っていることが多く、現地で確かめたところ、この図は日陰を 9〜32ポイント少なく見ています。割合の数字は出していません。形だけを見てください。</p>
+</section>
+
+<section class="step" id="step3"><span class="no">3／どの道で行くか</span>
+  <h2>日なたが少ないルート</h2>
+  <p class="lead">選んだ行き先まで、日なたのいちばん短い道です。道路のどちら側の歩道を歩くかまで出しています。</p>
+  <canvas id="map" width="720" height="540"></canvas>
+  <div class="legend">
+    <span><i style="background:var(--sun)"></i>日なたの歩道</span>
+    <span><i style="background:var(--shade)"></i>日陰の歩道</span>
+    <span><i style="background:#aeb6bf"></i>建物と高架の影</span>
+    <span><i style="background:var(--park)"></i>行き先</span>
+  </div>
+  <p class="note">ドラッグで移動、ピンチ／ホイールで拡大縮小、ダブルタップで元の範囲に戻ります。拡大すると郵便局や交番まで出ます。</p>
+  <p class="note" id="r4"></p>
+  <ol class="steps" id="turns"></ol>
+  <a class="gmap" id="gmap" target="_blank" rel="noopener">Googleマップで開く</a>
+  <p class="note">Googleマップは歩道の左右を区別しません。同じ道路でも、左右で日陰率が平均24〜52ポイント違います（実測）。曲がる場所の目安としてお使いください。</p>
+</section>
+
+<div class="disc">これは公開データからの推定値です。医学的な判断ではありません。のどの渇きに応じて自由に飲めるようにしてください（環境省）。</div>
+
+<details><summary>計算の内訳と、前提</summary>
+<table>
+<tr><th>項目</th><th>中身</th></tr>
+<tr><td>影</td><td>建物 LOD2 実形状585棟＋LOD1、高架デッキ679面。樹木は入っていません</td></tr>
+<tr><td>歩行速度</td><td>53.1 m/分（3〜5歳連れの実測・n=3）</td></tr>
+<tr><td>遊び方</td><td id="metsCell">走り回る中心（走る75%・実効METs 4.90）</td></tr>
+<tr><td>暑さ指数</td><td><b>既定は今日の値です。</b>環境省（練馬と東京の高い方）の、過ぎた時刻は実況、これからの時刻は予測（3時間刻みなので11/13/14/16時は内挿）。<b>取れないときは去年8月の平均時刻差（−0.22〜−1.38℃・ばらつき±1.0〜1.5℃）に戻り、その旨を画面に出します。</b>スライダーで手動の上書きもできます</td></tr>
+<tr><td>精度</td><td>L1＝歩行空間ネットワーク上／L3＝最後の数百mが直線距離からの概算</td></tr>
+<tr><td>日付</td><td>太陽の位置は 2026年8月12日で固定しています。晴天時の値です</td></tr>
+<tr><td>計算する場所</td><td>経路探索はこの端末の中で走ります。入力した位置はどこにも送っていません</td></tr>
+</table>
+</details>
+
+<details><summary>利用データ（5件・提供者とライセンス）</summary>
+<!-- ★ overflow-wrap：ライセンスURLが長いので、幅430pxで横にはみ出さないようにする -->
+<div style="font-size:12px;line-height:1.8;overflow-wrap:anywhere">
+  <!-- ★ 2026-08-23：事実監査で不足が出たので書き換えた。変更点は4つ。
+       (1) 各ライセンスに URL を付けた。
+           CC BY 4.0 第3条a項1.C は「ライセンスの全文またはそのURIかハイパーリンクの
+           いずれかを含めること」を要求し、CC BY 2.1 日本 第5条2項も「利用許諾の写し又は
+           URI」を求めている。ライセンス名だけの表示は条文を満たさず、
+           CC BY 4.0 第6条(a)により違反時点でライセンスは自動終了する。
+       (2) 加工の主体を明記した。
+           公共データ利用規約（第1.0版）は「編集・加工等を行ったこと及びその主体」を
+           明文で要求している。「加工して利用しています」だけでは「誰が」が無い。
+       (3) 環境省を正式名称「環境省熱中症予防情報サイト」にした（tos.php の出典記載例）。
+       (4) 「公共データ利用規約（第1.0版）」を全角括弧の正式表記にした。
+       ★ 最後の1文は、CC BY 4.0 と東京都オープンデータ利用規約 2(1)イ が禁じる
+          「提供元が作成したかのような態様」を避けるためのもの。
+       ★ 東京都3Dデジタルマップの提供者を「東京都」としているのは、
+          zip 内 metadata/udx_13116_pref_2025_op.xml の実見による：
+            <title>東京都3Dデジタルマップ_13116_pref_2025_op</title>
+            <useLimitation>Licensed under CC BY 4.0</useLimitation>
+            <organisationName>東京都都市整備局都市づくり政策部広域調整課</organisationName>
+          権利表記があるので PLATEAU Site Policy の「権利表記が無い限り PDL1.0」には
+          当たらず、CC BY 4.0 が直接適用される。lineage の「東京都以外が整備した範囲」に
+          豊島区は入っていない。 -->
+  <div>答えに反映しているデータ（いずれも「こかげ」が加工して利用しています）</div>
+  <div>・東京都3Dデジタルマップ（3D都市モデル 豊島区 2025年度版）／東京都／CC BY 4.0 <a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">https://creativecommons.org/licenses/by/4.0/deed.ja</a></div>
+  <div>・歩行空間ネットワークデータ（池袋駅周辺）／国土交通省／公共データ利用規約（第1.0版） <a href="https://www.digital.go.jp/resources/open_data/public_data_license_v1.0" target="_blank" rel="noopener">https://www.digital.go.jp/resources/open_data/public_data_license_v1.0</a></div>
+  <div>・公共施設一覧／豊島区／CC BY 2.1 日本 <a href="https://creativecommons.org/licenses/by/2.1/jp/" target="_blank" rel="noopener">https://creativecommons.org/licenses/by/2.1/jp/</a></div>
+  <div>・赤ちゃん・ふらっと一覧／東京都福祉局／CC BY 4.0 <a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">https://creativecommons.org/licenses/by/4.0/deed.ja</a></div>
+  <div>・環境省熱中症予防情報サイト（暑さ指数WBGT）／環境省／公共データ利用規約（第1.0版） <a href="https://www.digital.go.jp/resources/open_data/public_data_license_v1.0" target="_blank" rel="noopener">https://www.digital.go.jp/resources/open_data/public_data_license_v1.0</a></div>
+  <div style="margin-top:9px"><b>これは東京都・国土交通省・豊島区・環境省が作成したものではありません。</b></div>
+  <div style="margin-top:9px">ほかに4件（都道の街路樹／アメダス観測データ／緑のオープンデータ／都営バス GTFS-JP）を検証に使いましたが、この画面の答えには入っていません。</div>
+</div>
+</details>
+</div>
+
+<script type="module">
+/* ===================== エンジン ===================== */
+/* ★ 2026-08-22（C15）：子連れ歩行の METs を 2.0 → 2.8。実測 53.1 m/分（n=3）は
+   [R-09c] の 2.0「53m/分未満」から外れ、隣の 2.8「遅い＝53m/分」とほぼ一致するため。
+   ★ 実測3本のうち51.6は53未満で境界をまたぐ。ばらつきを画面に併記している。 */
+const C={DELTA_WBGT_SHADE:-2.0,DELTA_WBGT_CHILD_NORMAL:0.3,DELTA_WBGT_CHILD_HARSH:2.0,
+WBGT_INDOOR:25.0,SR_REF_ML_PER_MIN:10.8,BW_REF_KG:60.0,METS_REF:3.0,WBGT_REF:28.0,
+BETA_PER_DEG:0.165,BSA_EXPONENT:2/3,K_CHILD:1.0,GATE_WBGT:31.0,
+SPEED_M_PER_MIN:53.1,SNAP_M:80.0,ORIGIN_MAX:200.0,FALLBACK_M:400.0,DETOUR:1.3,
+METS:{walk_slow:2.8,stand:1.8,sit:1.3,play_active:5.8,play_light:2.8,play_sit:2.2}};
+const effWbgt=(base,{sunlit,harsh=true,indoor=false},f=1)=>{
+  if(indoor) return C.WBGT_INDOOR;
+  f=Math.min(Math.max(f,0),1); let w=base;
+  if(!sunlit) w+=C.DELTA_WBGT_SHADE*f;
+  const ch=(sunlit&&harsh)?C.DELTA_WBGT_CHILD_HARSH:C.DELTA_WBGT_CHILD_NORMAL;
+  return w+C.DELTA_WBGT_CHILD_NORMAL+(ch-C.DELTA_WBGT_CHILD_NORMAL)*f;};
+const sweat=(w,mets,bw)=>C.SR_REF_ML_PER_MIN*(mets/C.METS_REF)*Math.pow(bw/C.BW_REF_KG,C.BSA_EXPONENT)
+  *C.K_CHILD*Math.max(1+C.BETA_PER_DEG*(w-C.WBGT_REF),0.2);
+
+class Kokage{
+  constructor(b){this.b=b;this.hours=b.meta.hours;this.scale=b.meta.shade_scale;
+    this.n=b.nodes.lat.length;this.m=b.edges.u.length;
+    this.adj=Array.from({length:this.n},()=>[]);
+    for(let i=0;i<this.m;i++){this.adj[b.edges.u[i]].push(i);this.adj[b.edges.v[i]].push(i);}
+    this._c=null;}
+  other(ei,u){const E=this.b.edges;return E.u[ei]===u?E.v[ei]:E.u[ei];}
+  edgeMl(ei,hi,wbgt,bw,f=1){const E=this.b.edges,sh=E.shade[ei][hi]/this.scale;
+    const wk=E.dist[ei]/C.SPEED_M_PER_MIN,wt=E.wait[ei];let ml=0;
+    for(const [mins,mets] of [[wk,C.METS.walk_slow],[wt,C.METS.stand]]){if(mins<=0)continue;
+      for(const [fr,su] of [[1-sh,true],[sh,false]]){if(fr<=0)continue;
+        ml+=sweat(effWbgt(wbgt,{sunlit:su},f),mets,bw)*mins*fr;}}
+    return ml;}
+  nearestXY(x,y,maxd=C.SNAP_M,pool=null){const N=this.b.nodes;let best=-1,bd=Infinity;
+    for(let i=0;i<this.n;i++){if(pool&&!pool.has(i))continue;
+      const d=Math.hypot(N.x[i]-x,N.y[i]-y);if(d<bd){bd=d;best=i;}}
+    return {node:best,gap:bd<=maxd?0:bd,dist:bd};}
+  comps(){if(this._c)return this._c;
+    const of=new Int32Array(this.n).fill(-1);const sizes=[];let c=0;
+    for(let s=0;s<this.n;s++){if(of[s]>=0)continue;const st=[s];of[s]=c;let k=0;
+      while(st.length){const u=st.pop();k++;for(const ei of this.adj[u]){const v=this.other(ei,u);
+        if(of[v]<0){of[v]=c;st.push(v);}}}sizes.push(k);c++;}
+    return this._c={of,sizes};}
+  dijkstra(src,hi,wbgt,bw,f=1){
+    const ml=new Float64Array(this.n).fill(Infinity),met=new Float64Array(this.n),
+      sun=new Float64Array(this.n),prev=new Int32Array(this.n).fill(-1),prevE=new Int32Array(this.n).fill(-1);
+    ml[src]=0;const h=[[0,src]];
+    const push=x=>{h.push(x);let i=h.length-1;while(i>0){const p=(i-1)>>1;if(h[p][0]<=h[i][0])break;[h[p],h[i]]=[h[i],h[p]];i=p;}};
+    const pop=()=>{const t=h[0],l=h.pop();if(h.length){h[0]=l;let i=0;for(;;){const a=2*i+1,b2=a+1;let s=i;
+      if(a<h.length&&h[a][0]<h[s][0])s=a;if(b2<h.length&&h[b2][0]<h[s][0])s=b2;if(s===i)break;[h[s],h[i]]=[h[i],h[s]];i=s;}}return t;};
+    const E=this.b.edges;
+    while(h.length){const [d,u]=pop();if(d>ml[u]+1e-12)continue;
+      for(const ei of this.adj[u]){const v=this.other(ei,u),w=this.edgeMl(ei,hi,wbgt,bw,f);
+        if(ml[u]+w<ml[v]){ml[v]=ml[u]+w;met[v]=met[u]+E.dist[ei];
+          const sh=E.shade[ei][hi]/this.scale;
+          sun[v]=sun[u]+(E.dist[ei]/C.SPEED_M_PER_MIN+E.wait[ei])*(1-sh);
+          prev[v]=u;prevE[v]=ei;push([ml[v],v]);}}}
+    return {ml,met,sun,prev,prevE};}
+  /* 入口までの数十mに当てる日陰率。そのノードに接するリンクの長さ加重平均 */
+  edgeShadeAt(node,hi){const E=this.b.edges;let t=0,s=0;
+    for(const ei of this.adj[node]){t+=E.dist[ei];s+=E.dist[ei]*(E.shade[ei][hi]/this.scale);}
+    return t?s/t:0;}
+  localShade(node,hi,r=200){const N=this.b.nodes,E=this.b.edges;let t=0,s=0;
+    for(let i=0;i<this.m;i++){const u=E.u[i];
+      if(Math.hypot(N.x[u]-N.x[node],N.y[u]-N.y[node])>r)continue;
+      t+=E.dist[i];s+=E.dist[i]*(E.shade[i][hi]/this.scale);}
+    return t?s/t:0;}
+  sidewalkShade(x,y,hi,r=400){const N=this.b.nodes,E=this.b.edges;let t=0,s=0;
+    for(let i=0;i<this.m;i++){const u=E.u[i];
+      if(Math.hypot(N.x[u]-x,N.y[u]-y)>r)continue;
+      t+=E.dist[i];s+=E.dist[i]*(E.shade[i][hi]/this.scale);}
+    return t?s/t:0;}
+  recommend({x,y,hour,wbgt,stayMin=60,bw=15,metsPlay=4.9,sunFrac=1}){
+    const hi=this.hours.indexOf(hour);if(hi<0)throw new Error('未計算の時刻');
+    const cp=this.comps();const usable=new Set();
+    for(let i=0;i<this.n;i++) if(cp.sizes[cp.of[i]]>=20) usable.add(i);
+    /* ★ 2026-08-22：歩行空間ネットワークは池袋駅周辺 約2.5km×1.1km しか無い。
+       範囲外の地点を黙って最寄りノードに寄せると、出発地と経路が離れた絵になる。
+       destination.py は 200m を超えたら候補を返さない実装だったので、そこへ戻す。 */
+    const o=this.nearestXY(x,y,1e9,usable);
+    if(o.node<0||o.dist>C.ORIGIN_MAX) return {error:'outside', dist:o.dist};
+    const reach=new Set();for(let i=0;i<this.n;i++) if(cp.of[i]===cp.of[o.node]) reach.add(i);
+    /* ★ 2026-08-23（不具合修正）：ここは `mets=gate?C.METS.play_light:metsPlay` だった。
+       31以上のとき、利用者が選んだ「遊び方」を黙って 2.8 METs に差し替えていた。
+       「31以上なら屋内だろうし、屋内なら落ち着いて遊ぶだろう」という仮定だが、
+       遊び方を利用者が選べるようにした時点で、この仮定は勝手な上書きになる。
+       屋内モードで 11時=341 / 12時=258 と不連続に落ちるのはこれが原因で、
+       時刻の差ではないものを時刻の差として見せ、推奨時刻まで誤らせていた。
+       ★ 既定（暑さ指数29.0）は1時刻もゲートしないので、6つの数値は変わらない。 */
+    const gate=wbgt>=C.GATE_WBGT,mets=metsPlay;
+    const D=this.dijkstra(o.node,hi,wbgt,bw,sunFrac);
+    const rows=[], seenName=new Set();
+    for(const p of this.b.parks){
+      /* ★ 2026-08-22：終点は「公園の点の最寄りノード」ではなく、
+         「公園ポリゴンの縁から60m以内の候補ノードのうち、合計mLが最小のもの」。
+         区の公園データは点＋面積しか無く、形は土地利用ポリゴンから拾っているため、
+         点とポリゴンが最大146mずれる（東池袋中央公園の点は建物の中にあった）。 */
+      const ent=p.entry||[], gaps=p.entry_gap||[];
+      let pick=null;
+      for(let i=0;i<ent.length;i++){
+        const n=ent[i]; if(!reach.has(n)||D.ml[n]===Infinity) continue;
+        /* ★ 歩行空間ネットワークは池袋駅周辺しか無い。網の外は直線×迂回係数で近似し、
+           400m を超えたら候補にしない（destination.py の FALLBACK_M / DETOUR と同じ扱い）。 */
+        if(gaps[i]>C.FALLBACK_M) continue;
+        const gap=gaps[i]>0 ? gaps[i]*C.DETOUR : 0;
+        let extra=0, exSun=0;
+        if(gap>0){
+          const lsh = gaps[i]<=60 ? this.edgeShadeAt(n,hi) : this.localShade(n,hi);
+          const mins=gap/C.SPEED_M_PER_MIN;
+          for(const [fr,su] of [[1-lsh,true],[lsh,false]]) if(fr>0)
+            extra+=sweat(effWbgt(wbgt,{sunlit:su},sunFrac),C.METS.walk_slow,bw)*mins*fr;
+          exSun=mins*(1-lsh);
+        }
+        const tot=D.ml[n]+extra;
+        if(!pick||tot<pick.tot) pick={node:n,gap,extra,exSun,tot};
+      }
+      if(!pick) continue;
+      const acc = pick.gap===0 ? 'L1' : (pick.gap<=78 ? 'L2' : 'L3');
+      const move=pick.tot, dist=D.met[pick.node]+pick.gap, sunMin=D.sun[pick.node]+pick.exSun;
+      const shade=p.indoor?1:p.shade[hi]/this.scale;
+      let stay=0;
+      if(p.indoor) stay=sweat(C.WBGT_INDOOR,mets,bw)*stayMin;
+      else for(const [fr,su] of [[1-shade,true],[shade,false]]) if(fr>0)
+        stay+=sweat(effWbgt(wbgt,{sunlit:su,indoor:false},sunFrac),mets,bw)*stayMin*fr;
+      /* ★ 2026-08-22：公共施設一覧と赤ちゃん・ふらっとの両方に載っている施設は
+         同じ名前で2件出る（区民ひろば南池袋）。画面では区別していないので名前で1件にする。 */
+      if(seenName.has(p.name)) continue;
+      seenName.add(p.name);
+      rows.push({name:p.name,indoor:p.indoor,acc,node:pick.node,gap:pick.gap,
+                 dist2:Math.round(dist*2),dist1:Math.round(dist),
+                 move:move*2,stay,total:move*2+stay,shade,sunMin:sunMin*2,
+                 cx:p.cx,cy:p.cy});}
+    rows.sort((a,b)=>a.total-b.total);
+    return {gate,origin:o,hi,hour,wbgt,path:D,
+            outdoor:rows.filter(r=>!r.indoor),indoor:rows.filter(r=>r.indoor)};}
+}
+
+/* ===================== 読み込み ===================== */
+const $=s=>document.querySelector(s);
+const D_={shadow:{}};
+const AZ={11:150.5,12:189.3,13:223.2,14:243.9,15:257.1,16:267.1};
+/* ★ 入力の暑さ指数は「13時の値」。他の時刻には実測の時刻差を当てる（screen6.py と同値）。
+   ［事実：2026-08-17 実測］環境省 2025年8月・3地点・31日＝93サンプルの平均差。 */
+const WOFF={11:-0.44,12:-0.22,13:0.00,14:-0.35,15:-0.60,16:-1.38};
+const WSD ={11:1.20,12:0.98,13:0.00,14:1.29,15:1.33,16:1.46};
+/* ★ 2026-08-22：環境省の予測API（3時間刻み）が使えるようになったので、
+   その日の形に差し替えられるようにした。既定は WOFF のまま（提出資料の数字と合わせるため）。
+   予測を読み込んだら、スライダーは「13時の値をどれだけずらすか」として効き続ける。 */
+const wbgtAt=h=>{
+  const f=state.fc;
+  if(f&&f[h]!=null) return Math.round((f[h]+(state.wbgt-f[13]))*100)/100;
+  return Math.round((state.wbgt+WOFF[h])*100)/100;};
+async function load(){
+  const f={bundle:'kokage_graph.json',links:'map_links.json',foot:'map_foot.json',
+           parks:'map_parks.json',labels:'map_labels.json'};
+  for(const [k,v] of Object.entries(f)){const r=await fetch(v);
+    if(!r.ok) throw new Error(v+' ('+r.status+')'); D_[k]=await r.json();}
+  D_.points=D_.labels.points||[]; D_.labels=D_.labels.labels||[];
+}
+async function shadowFor(h){if(!D_.shadow[h]){const r=await fetch(`map_shadow_${h}.json`);
+  D_.shadow[h]=r.ok?await r.json():[];} return D_.shadow[h];}
+
+function fitAffine(N){
+  const n=N.lat.length;let sl=0,so=0,sx=0,sy=0;
+  for(let i=0;i<n;i++){sl+=N.lat[i];so+=N.lon[i];sx+=N.x[i];sy+=N.y[i];}
+  const ml=sl/n,mo=so/n,mx=sx/n,my=sy/n;
+  let Spp=0,Spq=0,Sqq=0,Sxp=0,Sxq=0,Syp=0,Syq=0;
+  for(let i=0;i<n;i++){const p=N.lat[i]-ml,q=N.lon[i]-mo,dx=N.x[i]-mx,dy=N.y[i]-my;
+    Spp+=p*p;Spq+=p*q;Sqq+=q*q;Sxp+=dx*p;Sxq+=dx*q;Syp+=dy*p;Syq+=dy*q;}
+  const det=Spp*Sqq-Spq*Spq;
+  const A={ml,mo,mx,my,xl:(Sqq*Sxp-Spq*Sxq)/det,xq:(Spp*Sxq-Spq*Sxp)/det,
+           yl:(Sqq*Syp-Spq*Syq)/det,yq:(Spp*Syq-Spq*Syp)/det};
+  A.det2=A.xl*A.yq-A.xq*A.yl;return A;}
+let AF=null;
+const ll2xy=(lat,lon)=>({x:AF.mx+AF.xl*(lat-AF.ml)+AF.xq*(lon-AF.mo),
+                         y:AF.my+AF.yl*(lat-AF.ml)+AF.yq*(lon-AF.mo)});
+const xy2ll=(x,y)=>{const dx=x-AF.mx,dy=y-AF.my;
+  return {lat:AF.ml+(AF.yq*dx-AF.xq*dy)/AF.det2,lon:AF.mo+(-AF.yl*dx+AF.xl*dy)/AF.det2};};
+
+/* ===================== 地図の描画 ===================== */
+/* ★ ポリゴンは外接矩形を1度だけ計算して覚えておき、画面外は描かない。
+   影は1時刻で 1.1MB あり、拡大しながら再描画すると全部描いていては間に合わない。 */
+function bboxOf(pg){
+  if(pg.__bb) return pg.__bb;
+  const rs=Array.isArray(pg[0][0])?pg:[pg];
+  let a=1e18,b=-1e18,c=1e18,d=-1e18;
+  for(const r of rs) for(const p of r){
+    if(p[0]<a)a=p[0]; if(p[0]>b)b=p[0]; if(p[1]<c)c=p[1]; if(p[1]>d)d=p[1];}
+  try{Object.defineProperty(pg,'__bb',{value:[a,b,c,d],enumerable:false});}catch(e){}
+  return [a,b,c,d];
+}
+function makeMap(cv,opt){
+  opt=opt||{};
+  const ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  const v={cx:0,cy:0,span:900};
+  let home=null, redraw=null;
+  const proj=p=>{const k=W/v.span;return [(p[0]-v.cx)*k+W/2, H/2-(p[1]-v.cy)*k];};
+  const unproj=(px,py)=>{const k=W/v.span;return [v.cx+(px-W/2)/k, v.cy+(H/2-py)/k];};
+  const view=()=>{const hw=v.span/2,hh=v.span*H/W/2;
+    return [v.cx-hw,v.cx+hw,v.cy-hh,v.cy+hh];};
+  function poly(polys,fill,stroke,lw){
+    if(!polys)return;
+    const vb=view();
+    ctx.fillStyle=fill||'transparent';ctx.strokeStyle=stroke||'transparent';ctx.lineWidth=lw||1;
+    for(const pg of polys){
+      const bb=bboxOf(pg);
+      if(bb[1]<vb[0]||bb[0]>vb[1]||bb[3]<vb[2]||bb[2]>vb[3])continue;
+      const rs=Array.isArray(pg[0][0])?pg:[pg];
+      ctx.beginPath();
+      for(const r of rs){if(r.length<3)continue;let p=proj(r[0]);ctx.moveTo(p[0],p[1]);
+        for(let i=1;i<r.length;i++){p=proj(r[i]);ctx.lineTo(p[0],p[1]);}ctx.closePath();}
+      if(fill)ctx.fill('evenodd'); if(stroke)ctx.stroke();}}
+  function clear(){ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);}
+  /* ★ 2026-08-23：色と太さを引数で受ける（選択画面は道を見せたいので濃く太く描く） */
+  function net(col,w){ctx.strokeStyle=col||'#e6e5df';ctx.lineWidth=w||1;ctx.beginPath();
+    for(const l of D_.links){let p=proj(l.c[0]);ctx.moveTo(p[0],p[1]);
+      for(let i=1;i<l.c.length;i++){p=proj(l.c[i]);ctx.lineTo(p[0],p[1]);}}ctx.stroke();}
+  function scalebar(){const k=W/v.span,m=v.span>1400?400:(v.span>600?200:100),px=m*k;
+    ctx.strokeStyle='#0b0b0b';ctx.lineWidth=2;ctx.beginPath();
+    ctx.moveTo(W-24-px,H-22);ctx.lineTo(W-24,H-22);ctx.stroke();
+    ctx.fillStyle='#0b0b0b';ctx.font='12px sans-serif';ctx.textAlign='right';ctx.textBaseline='bottom';
+    ctx.fillText(m+'m',W-24,H-26);}
+  function fit(pts,pad){const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
+    const a=Math.min(...xs)-pad,b=Math.max(...xs)+pad,c=Math.min(...ys)-pad,d=Math.max(...ys)+pad;
+    v.cx=(a+b)/2;v.cy=(c+d)/2;v.span=Math.max(b-a,(d-c)*W/H,260);}
+  function sunArrow(hour){
+    const az=AZ[hour]; if(az===undefined) return;
+    const th=(az-180)*Math.PI/180;      // 平面直角：+Y が北。南=0
+    const cx=68,cy=64,r=30;
+    const dx=Math.sin(th)*r, dy=-Math.cos(th)*r;
+    ctx.save();ctx.setLineDash([4,3]);ctx.strokeStyle='#eb6834';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(cx+dx,cy+dy);ctx.lineTo(cx-dx,cy-dy);ctx.stroke();ctx.restore();
+    ctx.fillStyle='#eb6834';ctx.beginPath();ctx.arc(cx+dx,cy+dy,4.5,0,7);ctx.fill();
+    ctx.fillStyle='#898781';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.textBaseline='top';
+    ctx.fillText('太陽の方向',cx+38,cy-8);}
+  /* 北。太陽の方向だけでは向きの手がかりが無い */
+  function northArrow(){
+    const x=W-34,y=34,r=17;
+    ctx.save();
+    ctx.fillStyle='rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(x,y,r+5,0,7);ctx.fill();
+    ctx.strokeStyle='#0b0b0b';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(x,y+r);ctx.lineTo(x,y-r);ctx.stroke();
+    ctx.fillStyle='#0b0b0b';ctx.beginPath();
+    ctx.moveTo(x,y-r-3);ctx.lineTo(x-5,y-r+7);ctx.lineTo(x+5,y-r+7);ctx.closePath();ctx.fill();
+    ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillText('N',x,y+r+2);
+    ctx.restore();
+  }
+  /* 目印。重なったら捨てる。縮尺が広いほど rank の高いものだけ残す */
+  function labels(extra,skip){
+    if(!D_.labels)return;
+    /* 方位マーク・縮尺・太陽の矢印の場所は先に埋めておく。重なると読めない */
+    const placed=[[W-62,0,W,62],[W-150,H-46,W,H],[0,26,190,110]];
+    const vb=view();
+    const maxRank = v.span>1500 ? 1 : (v.span>700 ? 2 : 3);
+    const hit=(a)=>placed.some(b=>!(a[2]<b[0]||a[0]>b[2]||a[3]<b[1]||a[1]>b[3]));
+    // 記号（地下出入口・停留所）は近いときだけ
+    if(v.span<=900){
+      for(const p of D_.points){
+        if(p.x<vb[0]||p.x>vb[1]||p.y<vb[2]||p.y>vb[3])continue;
+        const q=proj([p.x,p.y]);
+        ctx.fillStyle=p.t==='sub'?'#4a3aa7':'#52514e';
+        ctx.beginPath();ctx.arc(q[0],q[1],3,0,7);ctx.fill();
+      }
+    }
+    const list=(extra||[]).concat(
+      D_.labels.filter(l=>l.n!==skip&&l.r<=maxRank&&l.x>=vb[0]&&l.x<=vb[1]&&l.y>=vb[2]&&l.y<=vb[3])
+        .sort((a,b)=>a.r-b.r||Math.hypot(a.x-v.cx,a.y-v.cy)-Math.hypot(b.x-v.cx,b.y-v.cy)));
+    ctx.textBaseline='middle';ctx.textAlign='left';
+    for(const l of list){
+      const q=proj([l.x,l.y]);
+      const big=l.big||l.r===1&&l.t==='bldg';
+      ctx.font=(big?'bold ':'')+(big?12:11)+'px sans-serif';
+      const w=ctx.measureText(l.n).width, x=q[0]+7, y=q[1];
+      const box=[x-8,y-8,x+w+3,y+8];
+      if(box[0]<0||box[2]>W||box[1]<0||box[3]>H)continue;
+      if(hit(box))continue;
+      placed.push(box);
+      ctx.fillStyle=l.color||(l.t==='park'?'#12885f':l.t==='fac'?'#52514e':'#0b0b0b');
+      ctx.beginPath();ctx.arc(q[0],q[1],big?4:3,0,7);ctx.fill();
+      ctx.lineWidth=3;ctx.strokeStyle='rgba(255,255,255,.92)';
+      ctx.strokeText(l.n,x,y);
+      ctx.fillText(l.n,x,y);
+    }
+  }
+  /* 移動と拡大縮小 */
+  function interactive(fn){
+    redraw=fn; home={...v};
+    let drag=null, pinch=null;
+    const pos=e=>{const r=cv.getBoundingClientRect();
+      return [(e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height];};
+    cv.style.cursor='grab';
+    cv.style.touchAction='none';
+    cv.addEventListener('pointerdown',e=>{
+      if(e.pointerType==='touch'&&pinch)return;
+      cv.setPointerCapture(e.pointerId);
+      drag={p:pos(e),cx:v.cx,cy:v.cy,moved:0};cv.style.cursor='grabbing';});
+    cv.addEventListener('pointermove',e=>{
+      if(!drag)return;
+      const p=pos(e),k=W/v.span;
+      drag.moved=Math.max(drag.moved,Math.hypot(p[0]-drag.p[0],p[1]-drag.p[1]));
+      v.cx=drag.cx-(p[0]-drag.p[0])/k; v.cy=drag.cy+(p[1]-drag.p[1])/k;
+      redraw();});
+    const end=e=>{if(drag){cv.style.cursor='grab';
+      const moved=drag.moved;drag=null;
+      if(moved<4&&opt.onTap) opt.onTap(unproj(...pos(e)));}};
+    cv.addEventListener('pointerup',end);
+    cv.addEventListener('pointercancel',()=>{drag=null;cv.style.cursor='grab';});
+    cv.addEventListener('wheel',e=>{
+      e.preventDefault();
+      const p=pos(e),before=unproj(p[0],p[1]);
+      v.span=Math.min(Math.max(v.span*(e.deltaY>0?1.15:1/1.15),120),4000);
+      const after=unproj(p[0],p[1]);
+      v.cx+=before[0]-after[0]; v.cy+=before[1]-after[1];
+      redraw();},{passive:false});
+    let d0=null,s0=null;
+    cv.addEventListener('touchstart',e=>{
+      if(e.touches.length===2){pinch=1;drag=null;
+        d0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                      e.touches[0].clientY-e.touches[1].clientY);s0=v.span;}},{passive:true});
+    cv.addEventListener('touchmove',e=>{
+      if(e.touches.length===2&&d0){e.preventDefault();
+        const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                           e.touches[0].clientY-e.touches[1].clientY);
+        v.span=Math.min(Math.max(s0*d0/d,120),4000);redraw();}},{passive:false});
+    cv.addEventListener('touchend',()=>{if(d0){d0=null;pinch=null;}});
+    cv.addEventListener('dblclick',e=>{e.preventDefault();
+      if(home){v.cx=home.cx;v.cy=home.cy;v.span=home.span;redraw();}});
+  }
+  function setHome(){home={...v};}
+  return {ctx,W,H,v,proj,unproj,poly,clear,net,scalebar,fit,sunArrow,
+          northArrow,labels,interactive,setHome,view};
+}
+
+/* ===================== 状態 ===================== */
+let K=null,M4=null,MP=null;
+const state={x:null,y:null,label:'池袋駅東口',hour:13,wbgt:29.0,mets:4.9,stay:60,bw:15,place:'out',
+             earliest:11,pickIdx:0,res:null,live:null,fc:null};
+const linkGeom=new Map(), linkStruct=new Map();
+
+function idxLinks(){for(const l of D_.links){
+  linkGeom.set(l.a+'|'+l.b,l.c);linkGeom.set(l.b+'|'+l.a,l.c);
+  linkStruct.set(l.a+'|'+l.b,l.s);linkStruct.set(l.b+'|'+l.a,l.s);}}
+
+/* ===================== ① ゲート ===================== */
+const BANDS=[[21,'#7fb2e5','ほぼ安全'],[25,'#79c9a3','注意'],[28,'#f2c94c','警戒'],
+             [31,'#f2994a','厳重警戒'],[35,'#d03b3b','危険']];
+function drawGauge(){
+  const g=$('#gauge');g.innerHTML='';
+  const lo=21,hi=35;
+  BANDS.forEach(([s,c],i)=>{const e=i+1<BANDS.length?BANDS[i+1][0]:hi;
+    const el=document.createElement('i');el.style.background=c;
+    el.style.width=((e-s)/(hi-lo)*100)+'%';g.appendChild(el);});
+  const t=$('#gtick');
+  const pos=(state.wbgt-lo)/(hi-lo)*100;
+  t.innerHTML=`<b style="left:${Math.min(Math.max(pos,4),96)}%">▲ ${state.wbgt.toFixed(1)}</b>`;
+}
+
+/* ★ 2026-08-22：①を「今日、行けるか」から「今日、行ける時刻はあるか」に作り替えた。
+   以前は state.wbgt（＝13時の値）だけを見て「今日は外出を避けて」と言い切っていたが、
+   時刻ごとの暑さ指数を入れたことで、②には出られる時刻が並ぶのに①が全否定する、
+   という食い違いが出ていた。6時刻を1本の帯にして、赤（31以上）だけを名指しする。 */
+function runsOf(hours){            /* 連続する時刻をまとめる。[11,15,16] -> [[11,11],[15,16]] */
+  const r=[];
+  for(const h of hours){
+    const last=r[r.length-1];
+    if(last && h===last[1]+1) last[1]=h; else r.push([h,h]);
+  }
+  return r;
+}
+function phraseRuns(runs,lastHour,join){ /* 「11時か、15時以降」／「11時と16時」 */
+  return runs.map(([a,b])=>
+    b===lastHour ? (a===b?`${a}時`:`${a}時以降`)
+    : (a===b?`${a}時`:`${a}〜${b}時`)).join(join);
+}
+function drawTimeline(st){
+  const H=K.hours, last=H[H.length-1];
+  const ok=H.filter(h=>!st[h].gate), ng=H.filter(h=>st[h].gate);
+  const gb=$('#gateBox'), hh=$('#gateH'), ld=$('#gateLead');
+  /* ★ 2026-08-22：全時刻31以上のときは6行を畳み、「屋内を見る」だけ出す。
+     6行を並べると「今日は外に出せる時刻がありません」という言い切りが弱まるため。
+     ただし数字を見たい人のために <details> で開けるようにしてある。 */
+  const allGate = !ok.length && state.place!=='in';
+  $('#allGateBox').classList.toggle('hidden', !allGate);
+  $('#hoursWrap').classList.toggle('hidden', allGate && !$('#forceHours').open);
+  if(!allGate) $('#forceHours').open=false;
+
+  /* ★ 2026-08-23：見出しを「何時に出るか」を答える形にした（丸山さん指示）。
+     屋内を選んでいるときも、涼しい時刻に越したことはないので出発時刻をすすめる。
+     3パターン：
+       ① 推奨が立つ            → 「◯時の出発がおすすめです。」
+       ② 改善が5%未満          → 「どの時刻に出ても、大きくは変わりません。」
+       ③ 屋外モードで全時刻31以上 → 「今日は、外に出せる時刻がありません。」 */
+  const pr = pickRecommended(st);
+  /* ★ 2026-08-23（不具合修正）：出せる時刻が1つしか残っていないのに
+     「どの時刻に出ても、大きくは変わりません。」と出ていた。
+     候補が1つのときは gain が必ず0になるため（自分自身との差）。時刻を名指しする。 */
+  const recTxt = (pr.rec===null) ? null
+    : ((pr.n===1 || pr.gain>=5) ? `${pr.rec}時の出発がおすすめです。`
+                                : 'どの時刻に出ても、大きくは変わりません。');
+
+  if(!ok.length){
+    hh.textContent = state.place==='in'
+      ? (recTxt || '今日は、屋内で過ごしましょう。')
+      : '今日は、外に出せる時刻がありません。';
+    gb.className='crit';
+    /* ★ 2026-08-23：31以上／28以上の基本表現を確定（丸山さん決定）。
+       31以上＝「大人でも外出をなるべく避ける」／28以上＝「子どもは外出をなるべく避ける」。
+       出典は日本生気象学会 R-02 p.3 の危険帯 注意事項2文目
+       「外出はなるべく避け，涼しい室内に移動する．」（主語なし＝一般向け）。
+       1文目「高齢者においては安静状態でも…」は帯の危険性の説明で、2文目に係らない。
+       根拠：同 p.13「熱中症弱者の温度基準域」が b に「65歳以上の高齢者」を挙げ、
+       「一つ上の温度基準域の『注意事項』を適用する」としている。
+       注意事項が高齢者専用なら、高齢者に一つ上を適用せよという指示が成り立たない。
+       また幼児（同 a）は28以上で危険帯の注意事項を適用されるので、
+       その中身が高齢者限定だと適用先が空になる。 */
+    gb.textContent='11時から16時まで、暑さ指数31以上（大人でも外出をなるべく避けたいレベル）です。'
+      +'「こかげ」では屋外の遊び先はおすすめしません。';
+    ld.textContent = state.place==='in'
+      ? '「屋内」を選んでいるので、涼める屋内を時刻ごとに比べています。'
+      : '';
+  }else{
+    hh.textContent = recTxt || (ng.length
+      ? `今日は、${phraseRuns(runsOf(ok),last,'か、')}なら出られます。`
+      : '今日は出かけられます。');
+    gb.className=''; gb.textContent='';
+    if(ng.length){
+      ld.innerHTML=`<b>${phraseRuns(runsOf(ng),last,'と')}は暑さ指数が31以上（大人でも外出をなるべく避けたいレベル）です。</b>`
+        + (state.place==='in'
+            ? 'いまは「屋内」を選んでいるので、この時間帯も行き先を出します。'
+            : `この${ng.length}時間は外の行き先を出しません。`);
+    }else if(ok.some(h=>st[h].wbgt>=28)){
+      /* ★ 2026-08-23：幼児にはひとつ上の基準が当たる（R-02 p.13）ので、
+         28以上は「危険」帯の注意事項＝外出をなるべく避ける、が当たります。
+         そのうえで「こかげ」は行き先を出す。この緊張は隠さず書く。 */
+      ld.innerHTML='<b>28以上の時刻があります。</b>幼児にはひとつ上の基準が当たるため、'
+        +'<b>子どもは外出をなるべく避けたい</b>レベルです。それでも出かけるなら、時間と道を選んでください。';
+    }else{
+      ld.textContent='11時から16時まで、暑さ指数は28を下回っています。';
+    }
+  }
+
+  /* ★ 2026-08-23：屋内モードでは、時刻で動くのは「行き帰り」だけ。
+     屋内で過ごす分は暑さ指数25.0固定なので、滞在60分ぶんは全時刻とも同じ（既定で212mL）。
+     この一文が無いと、6行の差（既定で 281〜317mL）が何の差なのか読めない。 */
+  if(state.place==='in'){
+    ld.innerHTML += (ld.innerHTML?'':'')
+      + '<span class="note" style="display:block;margin-top:4px">'
+      + '時刻で変わるのは行き帰りの道だけです。屋内で過ごすぶんは、どの時刻も同じです。</span>';
+  }
+
+  /* ★ 2026-08-23：一部の時刻だけ31以上のとき、その行は数字を出さない。
+     「屋内なら何時がよいか」を比べたい人のために、屋内モードへの入口を出す。
+     ゲートが1時間でもあれば出す（2時間以上でも同じ）。 */
+  const tip=$('#toIndoorPartial');
+  const partial = state.place!=='in' && ng.length>0 && ok.length>0;
+  tip.classList.toggle('hidden', !partial);
+  if(partial) tip.textContent =
+    `${phraseRuns(runsOf(ng),last,'と')}に出るなら屋内です。屋内で6時刻を比べる`;
+}
+
+/* ===================== ② 時刻（C41 推奨） ===================== */
+function hourStats(){
+  const out={};
+  for(const h of K.hours){
+    const r=K.recommend({x:state.x,y:state.y,hour:h,wbgt:wbgtAt(h),metsPlay:state.mets,stayMin:state.stay,bw:state.bw});
+    /* ★ 2026-08-22：「屋内」を選んでいるときは、全時刻とも屋内で比べる。
+       ②と③が別のものを見ていると、目安mLと行き先が食い違う。 */
+    const list=isIndoor(r)?r.indoor:r.outdoor;
+    out[h]={best:list[0]?list[0].total:NaN,gate:r.gate,wbgt:wbgtAt(h),
+            shade:K.sidewalkShade(state.x,state.y,K.hours.indexOf(h))*100,res:r};
+  }
+  return out;
+}
+/* ★ 2026-08-22：ゲート（暑さ指数31以上）の時刻を推奨の候補から外す。
+   ゲート中は屋内しか出さないので mL が小さく出て、
+   「外に出てはいけない時刻」を「待つ価値あり」と推してしまっていた。 */
+function pickRecommended(st){
+  /* ★ 2026-08-22：ゲート時刻を外すのは「できれば屋外」のときだけ。
+     「屋内」を選んでいるなら 31以上でも行き先は出せるので、外す理由が無い。 */
+  const cand=K.hours.filter(h=>h>=state.earliest&&(state.place==='in'||!st[h].gate));
+  if(!cand.length) return {rec:null,gain:0,allGate:true};
+  const base=st[cand[0]].best;
+  let rec=cand[0];
+  for(const h of cand) if(st[h].best<st[rec].best) rec=h;
+  const gain=(base-st[rec].best)/base*100;
+  return {rec,gain,base,n:cand.length};
+}
+/* ★ 2026-08-23（C51）：いまはどこからも呼ばれていない。
+   前後の両方と比べる版。#worse を「前の時刻とだけ比べる」に変えたときに使わなくなった。
+   前後比較に戻す可能性があるので、消さずに残してある。 */
+function worseThanNeighbour(st,h){
+  const i=K.hours.indexOf(h);
+  const prev=K.hours[i-1],next=K.hours[i+1];
+  const worse=[];
+  if(st[h].gate) return worse;
+  if(prev!==undefined && !st[prev].gate && st[h].best>st[prev].best) worse.push(prev);
+  if(next!==undefined && !st[next].gate && st[h].best>st[next].best) worse.push(next);
+  return worse;
+}
+function renderHours(st){
+  const w=$('#hours');w.innerHTML='';
+  /* ★ 2026-08-23：緑バッジ「待つ価値あり」を外した（丸山さん指示）。
+     「いちばん早く出かける時間」の選択を消したことで rec がほぼ常に最終時刻（16時）になり、
+     ①の見出し「◯時の出発がおすすめです。」と同じことを2回言う状態になっていたため。
+     判定そのもの（pickRecommended）は①の見出しが使うので残してある。 */
+  for(const h of K.hours){
+    const b=document.createElement('button');
+    b.className='hr';b.dataset.h=h;b.setAttribute('aria-pressed',String(h===state.hour));
+    const sh=st[h].shade;
+    let badge='';
+    /* ★ 2026-08-22：31以上の時刻は①で名指ししたので、②では灰色に沈めて「屋内のみ」と短く言う。
+       クリックは殺さない（涼める屋内への導線が消えてしまうため）。 */
+    if(st[h].gate){
+      /* ★ 屋内を選んでいるなら沈めない。外が31以上という情報だけ出す。 */
+      badge = state.place==='in'
+        ? '<span class="badge gray">外は31以上</span>'
+        : '<span class="badge gray">31以上・屋内のみ</span>';
+      if(state.place!=='in') b.classList.add('dim');
+    }
+    /* ★ 31未満の時刻にバッジは出さない。ここには3つあったが、すべて外した。
+       ・28以上（2026-08-22）……池袋の8月は6時刻ともほぼ28以上で、毎行出ると意味が薄れる。
+                                左端のチップの色と凡例で表す。
+       ・「◯時より悪い」の橙（2026-08-23）……#worse の一文に移した。
+       ・「待つ価値あり」の緑（2026-08-23）……①の見出しと重複するため。
+       ★★ 注意：`pitch.md` §5-B は 橙バッジを「案Bの本体」と書いており、
+          デッキ P06 と `slides.md` の台本も「悪くなる時刻を出します」と言っている。
+          この3箇所の言い方を直す必要がある（未対応）。 */
+    /* ★ 2026-08-22：バッジは列ではなくバーの上に積む。
+       列に置くと文字数ぶんバーが縮み、日陰率を時刻どうしで比べられなくなっていた。 */
+    /* ★ 2026-08-22：行の左端に暑さ指数の色。緑=28未満／黄=28以上／赤=31以上 */
+    const lv = st[h].gate ? '#d03b3b' : (st[h].wbgt>=28 ? '#f2c94c' : '#79c9a3');
+    /* ★ 2026-08-23：「できれば屋外」で31以上の時刻は、数字を出さない。
+       ここに屋内の数字を入れると、屋外の数字（他の行）と同じ列に並んでしまい、
+       「12時=258 の方が 11時=816 より少ない」と読めてしまう。
+       だが2つは別のものの目安で、そもそも比べられない
+       （他の行が屋外の数字である以上、この画面では屋内どうしの比較にもならない）。
+       屋内どうしを比べたい場合は、下の入口から屋内モードへ。行のクリックは殺さない。 */
+    const gOut = st[h].gate && state.place!=='in';
+    const mlHtml = gOut
+      ? `<span class="ml"><b>—</b><i>&nbsp;</i></span>`
+      : `<span class="ml"><b>${Math.round(st[h].best)}</b><i>mL</i></span>`;
+    const subTxt = gOut ? '屋外の目安は出しません'
+                        : (state.place==='in'?'屋内の':'')+'発汗量目安';
+    b.innerHTML=`<i class="chip" style="background:${lv}"></i><span class="t">${h}時</span>`
+      +`<span class="mid"><span class="bd">${badge}</span>`
+      +`<span class="bar"><i style="width:${sh.toFixed(0)}%"></i></span></span>`
+      +`<span class="s">${mlHtml}<span class="sub">${subTxt}</span><span class="sub">暑さ指数 ${st[h].wbgt.toFixed(1)}${(!state.fc&&WSD[h])?'±'+WSD[h].toFixed(1):''}</span></span>`
+      +`<span class="ch">›</span>`;
+    b.onclick=()=>{state.hour=h;render();document.getElementById('step2').scrollIntoView();};
+    w.appendChild(b);
+  }
+  /* ★ 2026-08-23：「◯時に出るより…」の1行は削除（丸山さん指示）。
+     代わりに、外した橙バッジの中身を「悪くなる時刻」の一文として #worse に出す（案2）。
+     ★ 2026-08-23（C51）：12時・14時への固定を外し、全時刻を見るようにした。
+     ★ あわせて比較の向きを「ひとつ前の時刻」だけに絞った。
+        以前は前後どちらとも比べていたので、たとえば「12時は13時より悪くなります」
+        （＝もう少し待った方が良い）という、見出しの
+        「待てば良くなる、とは限りません」と逆のことを言う文が混ざっていた。
+        いま出すのは「あとの時刻が、前の時刻より悪くなった」場合だけ。 */
+  const wz=[];
+  for(let i=1;i<K.hours.length;i++){
+    const h=K.hours[i], prev=K.hours[i-1];
+    /* ★ 31以上の時刻を外すのは「できれば屋外」のときだけ。
+       「屋内」を選んでいるなら 31以上でも行き先を出しているので、外す理由が無い
+       （pickRecommended と同じ扱いに揃えた）。 */
+    if(state.place!=='in' && (st[h].gate||st[prev].gate)) continue;
+    if(st[h].best>st[prev].best) wz.push(`${h}時は${prev}時より悪くなります`);
+  }
+  const wv=$('#worse');
+  if(wz.length){wv.classList.remove('hidden');
+    wv.innerHTML='★ <b>待てば良くなる、とは限りません。</b>'+wz.join('。')+'。';}
+  else wv.classList.add('hidden');
+}
+
+/* ===================== ③ 行き先 ===================== */
+async function renderCards(res){
+  const useIn=isIndoor(res);
+  if(useIn) await loadHours();
+  const list=(useIn?res.indoor:res.outdoor).slice(0,3);
+  /* ★ 2026-08-23：屋外・屋内で出し分けず、常に同じ問いにする（丸山さん指示） */
+  $('#h3').textContent = 'どこに行きますか？';
+  $('#n3').classList.toggle('hidden', useIn);
+  /* ★ 2026-08-22：屋内のときは日陰の形を出さないので、リード文も差し替える。 */
+  $('#lead3').textContent = useIn
+    ? '往復と滞在で失われる水分量が少ないと推測される順に、3つご提案します。屋内は暑さ指数25.0として計算しています。開館時間は、分かるものだけ出しています。'
+    : '往復と滞在で失われる水分量が少ないと推測される順に、3つご提案します。お子様が日陰で遊んでくれそうか、どこが影になるかを見てみてください。';
+  const c=$('#cards');c.innerHTML='';
+  const sh=await shadowFor(state.hour);
+  list.forEach((t,i)=>{
+    const btn=document.createElement('button');
+    btn.className='card';btn.setAttribute('aria-pressed',String(i===state.pickIdx));
+    /* ★ 2026-08-22：屋内は日陰の形を出す意味が無いので、枠ごと出さない */
+    let cv=null;
+    if(!t.indoor){
+      const fig=document.createElement('figure');
+      cv=document.createElement('canvas');cv.width=640;cv.height=300;fig.appendChild(cv);
+      btn.appendChild(fig);
+    }
+    const body=document.createElement('div');body.className='body';
+    body.innerHTML=`<div class="nm">${t.name}</div>`
+      +`<div class="mt">片道 ${t.dist1}m・歩いて約${Math.round(t.dist1/53.1)}分／往復で日なたにいる時間 ${t.sunMin.toFixed(0)}分</div>`
+      +`<div class="ml">水 <b>${Math.round(t.total)}mL</b> 分の暑さ`
+      +`<span style="color:var(--muted)">（往復 ${Math.round(t.move)} ＋ 滞在${state.stay}分 ${Math.round(t.stay)}）</span></div>`
+      +(t.indoor?hoursHtml(t.name):'');
+    btn.appendChild(body);
+    btn.onclick=()=>{state.pickIdx=i;render();document.getElementById('step3').scrollIntoView();};
+    c.appendChild(btn);
+    if(cv) drawPark(cv,t,sh);
+  });
+  /* ★ 2026-08-23：「1番目と2番目の差は◯mL（◯%）です」の一文を削除（丸山さん指示）。
+     要素 #tie ごと外した。差そのものは3枚のカードの mL を見れば分かる。 */
+}
+function drawPark(cv,t,shadowRings){
+  const m=makeMap(cv);
+  const rings=D_.parks[t.name];
+  m.clear();
+  if(!rings||!rings.length){
+    m.ctx.fillStyle='#898781';m.ctx.font='13px sans-serif';m.ctx.textAlign='center';
+    m.ctx.fillText(t.indoor?'屋内の施設です':'形のデータがありません',cv.width/2,cv.height/2);return;}
+  const pts=[];
+  for(const pg of rings){const rs=Array.isArray(pg[0][0])?pg:[pg];for(const p of rs[0])pts.push(p);}
+  m.fit(pts,30);
+  m.poly(D_.foot,'#f1f0ed','#e0ded7');
+  // 公園の中だけ影を描く
+  m.ctx.save();
+  m.ctx.beginPath();
+  for(const pg of rings){const rs=Array.isArray(pg[0][0])?pg:[pg];
+    for(const r of rs){let p=m.proj(r[0]);m.ctx.moveTo(p[0],p[1]);
+      for(let i=1;i<r.length;i++){p=m.proj(r[i]);m.ctx.lineTo(p[0],p[1]);}m.ctx.closePath();}}
+  m.ctx.fillStyle='#eaf6ef';m.ctx.fill('evenodd');
+  m.ctx.clip('evenodd');
+  m.poly(shadowRings,'#2a78d6',null);
+  m.ctx.restore();
+  m.poly(rings,null,'#1baf7a',2);
+  m.sunArrow(state.hour);
+  m.scalebar();
+}
+
+/* ===================== ④ 道 ===================== */
+function routeSegments(res,t){
+  const E=K.b.edges,ids=K.b.nodes.id,segs=[];
+  let v=t.node;
+  while(res.path.prev[v]>=0){
+    const ei=res.path.prevE[v],u=res.path.prev[v];
+    const key=ids[u]+'|'+ids[v];
+    segs.push({geom:linkGeom.get(key),struct:linkStruct.get(key)||0,
+               shade:E.shade[ei][res.hi]/K.scale,dist:E.dist[ei],u,v});
+    v=u;
+  }
+  return segs.reverse();
+}
+let lastKey='';
+async function drawRoute(res,t){
+  if(!M4){M4=makeMap($('#map'));M4.interactive(()=>paintRoute());}
+  const segs=routeSegments(res,t);
+  M4.shadow=await shadowFor(state.hour);
+  M4.segs=segs; M4.t=t;
+  const key=[state.hour,t.name,Math.round(state.x),Math.round(state.y)].join('|');
+  if(key!==lastKey){
+    lastKey=key;
+    const pts=[[state.x,state.y]];
+    for(const s of segs){const g=s.geom||[[K.b.nodes.x[s.u],K.b.nodes.y[s.u]],[K.b.nodes.x[s.v],K.b.nodes.y[s.v]]];
+      for(const p of g)pts.push(p);}
+    const rr=D_.parks[t.name];
+    if(rr) for(const pg of rr){const rs=Array.isArray(pg[0][0])?pg:[pg];for(const p of rs[0])pts.push(p);}
+    M4.fit(pts,110); M4.setHome();
+  }
+  paintRoute();
+  return segs;
+}
+function paintRoute(){
+  const m=M4; if(!m||!m.segs)return;
+  const t0=performance.now();
+  const t=m.t, rings=D_.parks[t.name];
+  m.clear();
+  m.poly(m.shadow,'#aeb6bf',null);
+  m.poly(D_.foot,'#f7f6f3','#e0ded7');
+  m.net();
+  if(rings) m.poly(rings,'rgba(27,175,122,.28)','#1baf7a',2);
+  m.ctx.lineCap='round';m.ctx.lineJoin='round';
+  for(const s of m.segs){
+    const g=s.geom||[[K.b.nodes.x[s.u],K.b.nodes.y[s.u]],[K.b.nodes.x[s.v],K.b.nodes.y[s.v]]];
+    m.ctx.strokeStyle=s.shade>=0.5?'#2a78d6':'#eb6834';m.ctx.lineWidth=5;
+    m.ctx.beginPath();let p=m.proj(g[0]);m.ctx.moveTo(p[0],p[1]);
+    for(let i=1;i<g.length;i++){p=m.proj(g[i]);m.ctx.lineTo(p[0],p[1]);}m.ctx.stroke();
+  }
+  const dn=K.b.nodes;
+  if(!m.segs.length){                       // 経路0本。せめて直線で結ぶ
+    m.ctx.save();m.ctx.setLineDash([6,5]);m.ctx.strokeStyle='#898781';m.ctx.lineWidth=3;
+    const a=m.proj([state.x,state.y]),b2=m.proj([dn.x[t.node],dn.y[t.node]]);
+    m.ctx.beginPath();m.ctx.moveTo(a[0],a[1]);m.ctx.lineTo(b2[0],b2[1]);m.ctx.stroke();m.ctx.restore();}
+  m.labels([{n:'出発',x:state.x,y:state.y,r:0,big:true,color:'#0b0b0b'},
+            {n:t.name,x:dn.x[t.node],y:dn.y[t.node],r:0,big:true,color:'#12885f'}], t.name);
+  const o=m.proj([state.x,state.y]);
+  m.ctx.fillStyle='#0b0b0b';m.ctx.beginPath();m.ctx.arc(o[0],o[1],7,0,7);m.ctx.fill();
+  m.ctx.fillStyle='#fff';m.ctx.beginPath();m.ctx.arc(o[0],o[1],3,0,7);m.ctx.fill();
+  m.sunArrow(state.hour);m.northArrow();m.scalebar();
+  window.__paintMs=Math.round(performance.now()-t0);
+}
+function bearing(a,b){return Math.atan2(b[0]-a[0],b[1]-a[1])*180/Math.PI;}
+function turnWord(d){
+  d=((d+540)%360)-180;
+  if(Math.abs(d)<25) return null;
+  if(Math.abs(d)>150) return '引き返す';
+  if(d>0) return Math.abs(d)>65?'右へ':'ななめ右へ';
+  return Math.abs(d)>65?'左へ':'ななめ左へ';
+}
+/* ★ 手順は「歩ける粒度」まで畳む。リンク1本ずつ出すと40行を超えて読めない。
+   ①日かげ/日なたが同じで、方位の変化が30度未満なら1本にまとめる（横断歩道は印だけ残す）
+   ②それでも10行を超えるうちは、いちばん短い区間を隣に吸収させる */
+function renderTurns(segs){
+  const ol=$('#turns');ol.innerHTML='';
+  /* ★ 2026-08-22：出発地と行き先が同じノードに付くと経路が0本になり、
+     地図に線が出ないまま何も説明が無かった。 */
+  if(!segs.length){
+    const li=document.createElement('li');li.style.gridTemplateColumns='1fr';
+    li.innerHTML='<span>出発地のすぐそばです。歩行空間ネットワークの上では同じ地点になりました。</span>';
+    ol.appendChild(li);return;}
+  let merged=[];
+  for(const s of segs){
+    const g=s.geom||[[K.b.nodes.x[s.u],K.b.nodes.y[s.u]],[K.b.nodes.x[s.v],K.b.nodes.y[s.v]]];
+    const br=bearing(g[0],g[g.length-1]);
+    const cross=(s.struct===3||s.struct===4);
+    const shaded=s.shade>=0.5;
+    const last=merged[merged.length-1];
+    if(last&&last.shaded===shaded&&turnWord(br-last.br)===null){
+      last.dist+=s.dist;last.br=br;last.cross=last.cross||cross;
+    }else merged.push({dist:s.dist,br,cross,shaded,turn:last?turnWord(br-last.br):null});
+  }
+  while(merged.length>10){
+    let k=1;
+    for(let i=1;i<merged.length;i++) if(merged[i].dist<merged[k].dist) k=i;
+    const s=merged[k],t=merged[k-1];
+    t.dist+=s.dist;t.cross=t.cross||s.cross;t.br=s.br;
+    if(s.dist>t.dist/2) t.shaded=s.shaded;
+    merged.splice(k,1);
+  }
+  const crossings=merged.filter(s=>s.cross).length;
+  for(const s of merged){
+    const li=document.createElement('li');
+    const d=document.createElement('span');d.className='d';d.textContent=Math.round(s.dist)+'m';
+    const x=document.createElement('span');
+    const side=s.shaded?'<span class="o">日かげの歩道</span>':'<span class="x">日なたの歩道</span>';
+    x.innerHTML=(s.turn?s.turn+'、':'')+(s.cross?'横断歩道を渡って ':'')+side+'を進む';
+    li.appendChild(d);li.appendChild(x);ol.appendChild(li);
+  }
+  const head=document.createElement('li');
+  head.style.gridTemplateColumns='1fr';
+  head.innerHTML=crossings
+    ? `<span>途中で <b>${crossings}回</b>、道路の反対側へ渡ります。反対側の歩道の方が日陰だからです。</span>`
+    : `<span>道路を渡らずに着きます。</span>`;
+  ol.insertBefore(head,ol.firstChild);
+}
+function gmapUrl(segs,t){
+  const ids=K.b.nodes.id,N=K.b.nodes;
+  const o=xy2ll(state.x,state.y);
+  const dst=xy2ll(N.x[t.node],N.y[t.node]);
+  // 経由地はモバイル上限の3つ。曲がる点（方位が45度以上変わる点）から等間隔に採る
+  const turns=[];
+  for(let i=1;i<segs.length;i++){
+    const g0=segs[i-1].geom,g1=segs[i].geom;
+    if(!g0||!g1)continue;
+    const d=((bearing(g1[0],g1[g1.length-1])-bearing(g0[0],g0[g0.length-1])+540)%360)-180;
+    if(Math.abs(d)>=45) turns.push(g1[0]);
+  }
+  let pick=[];
+  if(turns.length<=3) pick=turns;
+  else for(let i=0;i<3;i++) pick.push(turns[Math.round((i+1)*turns.length/4)]);
+  const wp=pick.map(p=>{const q=xy2ll(p[0],p[1]);return `${q.lat.toFixed(6)},${q.lon.toFixed(6)}`}).join('|');
+  let u=`https://www.google.com/maps/dir/?api=1&travelmode=walking`
+    +`&origin=${o.lat.toFixed(6)},${o.lon.toFixed(6)}`
+    +`&destination=${dst.lat.toFixed(6)},${dst.lon.toFixed(6)}`;
+  if(wp) u+=`&waypoints=${encodeURIComponent(wp)}`;
+  return u;
+}
+
+/* ===================== まとめて描き直す ===================== */
+let busy=false, keepWarn=false;
+async function render(){
+  if(state.x===null||busy) return;
+  busy=true;
+  try{
+    drawGauge();
+    /* ★ 出発地が歩行空間ネットワークの外なら、計算せずに前の地点へ戻す。
+       黙って最寄りの道へ寄せると、出発地と経路が離れた絵になってしまう。 */
+    const probe=K.recommend({x:state.x,y:state.y,hour:state.hour,wbgt:wbgtAt(state.hour),metsPlay:state.mets,stayMin:state.stay,bw:state.bw});
+    if(probe.error==='outside'){
+      const w=$('#outside');
+      w.classList.remove('hidden');
+      w.innerHTML=`この地点は計算できません。歩行空間ネットワーク（池袋駅周辺 約2.5km×1.1km）の外で、`
+        +`いちばん近い道まで <b>約${Math.round(probe.dist)}m</b> あります。`
+        +`地図の細い線が引かれている範囲をお選びください。`;
+      if(state.prev){state.x=state.prev.x;state.y=state.prev.y;
+        $('#originLabel').textContent=state.prev.label;
+        busy=false; keepWarn=true; await render(); keepWarn=false;
+        return;}
+      busy=false;
+      return;
+    }
+    if(!keepWarn) $('#outside').classList.add('hidden');
+    state.prev={x:state.x,y:state.y,label:$('#originLabel').textContent};
+    const st=hourStats();
+    drawTimeline(st);
+    renderHours(st);
+    const res=st[state.hour].res;
+    state.res=res;
+    const list=isIndoor(res)?res.indoor:res.outdoor;
+    if(state.pickIdx>=Math.min(3,list.length)) state.pickIdx=0;
+    await renderCards(res);
+    const t=list[state.pickIdx];
+    if(t){
+      const segs=await drawRoute(res,t);
+      renderTurns(segs);
+      $('#r4').innerHTML=`${state.hour}時に ${t.name} へ行くなら、往復で日なたにいる時間は <b>${t.sunMin.toFixed(0)}分</b>です。15分ごとに給水してください。`;
+      $('#gmap').href=gmapUrl(segs,t);
+    }
+    if(MP) drawPick(false);
+  }finally{busy=false;}
+}
+
+/* ===================== 出発地を選ぶ地図 ===================== */
+async function drawPick(refit){
+  const m=MP; if(!m)return;
+  m.shadow=await shadowFor(state.hour);
+  if(refit){m.fit([[state.x-450,state.y-450],[state.x+450,state.y+450]],0);m.setHome();}
+  paintPick();
+}
+/* ★ 計算できるのは歩行空間ネットワークから200m以内だけ。
+   範囲の外を白く伏せて、どこをタップすれば答えが出るかを見えるようにする。 */
+function coverageVeil(m){
+  const N=K.b.nodes, vb=m.view(), k=m.W/m.v.span, r=C.ORIGIN_MAX*k;
+  const off=document.createElement('canvas');off.width=m.W;off.height=m.H;
+  const oc=off.getContext('2d');
+  oc.fillStyle='rgba(252,252,251,.76)';oc.fillRect(0,0,m.W,m.H);
+  oc.globalCompositeOperation='destination-out';
+  oc.beginPath();
+  for(let i=0;i<K.n;i++){
+    if(N.x[i]<vb[0]-C.ORIGIN_MAX||N.x[i]>vb[1]+C.ORIGIN_MAX||
+       N.y[i]<vb[2]-C.ORIGIN_MAX||N.y[i]>vb[3]+C.ORIGIN_MAX)continue;
+    const q=m.proj([N.x[i],N.y[i]]);
+    oc.moveTo(q[0]+r,q[1]);oc.arc(q[0],q[1],r,0,7);}
+  oc.fill();
+  m.ctx.drawImage(off,0,0);
+}
+
+function paintPick(){
+  const m=MP; if(!m)return;
+  m.clear();
+  /* ★ 2026-08-23：出発地を選ぶ地図から影を外した。
+     ここでの用事は「どこをタップするか」であって暑さではないので、灰色の影が邪魔になる。
+     あわせて図と地を反転した：建物を中間グレーで塗り、道路の側を白のまま残す。
+     以前は建物 #f7f6f3・背景 白 でほぼ同じ明るさだったため、建物の隙間が道に見えなかった。
+     歩行空間ネットワーク（＝道の形そのもの）も、消えかけていた 1px #e6e5df から上げている。 */
+  const BLD='#dcdad2', BLDL='#c6c3b9';
+  m.poly(D_.foot,BLD,BLDL);m.net('#8d9aa8',1.6);
+  coverageVeil(m);
+  m.poly(D_.foot,BLD,BLDL);m.net('#8d9aa8',1.6);
+  m.labels([{n:'ここから出発',x:state.x,y:state.y,r:0,big:true,color:'#0b0b0b'}]);
+  const o=m.proj([state.x,state.y]);
+  m.ctx.fillStyle='#0b0b0b';m.ctx.beginPath();m.ctx.arc(o[0],o[1],8,0,7);m.ctx.fill();
+  m.ctx.fillStyle='#fff';m.ctx.beginPath();m.ctx.arc(o[0],o[1],3.5,0,7);m.ctx.fill();
+  m.northArrow();m.scalebar();
+}
+
+/* ===================== UI 配線 ===================== */
+$('#wbgt').addEventListener('input',e=>{
+  state.wbgt=parseFloat(e.target.value);$('#wbgtV').textContent=state.wbgt.toFixed(1);
+  $('#liveSrc').textContent='手で上書きした値です。';
+  render();});
+/* ★ 2026-08-22：屋内を出すかどうか。
+   「屋内」を選んだとき、または暑さ指数31以上（ゲート）のときは屋内。
+   ゲートは選択より強い（31以上で屋外を出すことはしない）。 */
+const isIndoor = res => state.place==='in' || !!res.gate;
+
+/* ★ 開館時間。分かるものは「◯時」と出典・確認日を出し、分からないものは
+   「データがありません」と書く。558件中28件しか入っておらず、しかもその24件は保育園で、
+   こかげが薦める区民ひろば・図書館には1件しか無い（roadmap ★4 の実例そのもの）。 */
+let HOURS=null;
+async function loadHours(){
+  if(HOURS!==null) return HOURS;
+  try{ HOURS = await (await fetch('facility_hours.json')).json(); }
+  catch(e){ HOURS = {checked:'', sources:{}, hours:{}}; }
+  return HOURS;
+}
+function hoursHtml(name){
+  const H=HOURS; if(!H) return '';
+  const h=H.hours[name];
+  if(!h) return '<div class="hrs none">開館時間のデータがありません。おでかけ前にご確認ください。</div>';
+  const s=H.sources[h.src]||{};
+  return `<div class="hrs"><b>${h.hours}</b>${h.day?`（${h.day}）`:''}`
+    +`<span class="hsrc">出典：${s.name||''}${s.ver?`／${s.ver}`:''}`
+    +`${H.checked?`／${H.checked} に確認`:''}</span></div>`;
+}
+/* ★ 2026-08-22：全時刻31以上の日。ボタンひとつで屋内モードへ。
+   ★ 2026-08-23（不具合修正）：ここは `$('#place').value='in'` と書いてあった。
+      「どこで遊びたいですか？」を <select id="place"> からチップ #chipPlace に変えたとき、
+      この1行の追従が漏れていた。$('#place') が null になり、
+      Cannot set properties of null で例外 → 続く render() が走らず、
+      全時刻31以上の日にこのボタンが何も起こさない状態になっていた。 */
+function setPlace(v){
+  state.place=v; state.pickIdx=0;
+  const box=$('#chipPlace');
+  if(box) for(const c of box.querySelectorAll('.chip')) c.classList.toggle('on', c.dataset.v===v);
+}
+$('#toIndoor').onclick=()=>{setPlace('in');render();};
+/* ★ 2026-08-23：一部の時刻だけ31以上の日の入口。押したあと6行が見える位置へ。 */
+$('#toIndoorPartial').onclick=()=>{setPlace('in');render();$('#step1').scrollIntoView();};
+$('#forceHours').addEventListener('toggle',()=>render());
+/* ★ 2026-08-22：遊び方と体重。既定のままなら数字は動かない。 */
+const METS_LABEL={'5.80':'ずっと走っている（走る100%','4.90':'走り回る中心（走る75%',
+  '4.00':'半々（走る50%','3.10':'座って遊ぶ中心（走る25%','2.20':'ほとんど座っている（走る0%'};
+/* ★ 体重は 12〜22kg に丸める。発汗の体格係数は成人からの外挿で、
+   3〜5歳の範囲を外れたところで数字を出さないため。 */
+/* ★ 2026-08-23：チップの配線。data-k で state のキーを決める。 */
+function wireChips(id){
+  const box=$('#'+id), key=box.dataset.k;
+  box.addEventListener('click',e=>{
+    const b=e.target.closest('.chip'); if(!b||b.classList.contains('on')) return;
+    for(const c of box.querySelectorAll('.chip')) c.classList.toggle('on', c===b);
+    const v=b.dataset.v;
+    if(key==='place'){ state.place=v; state.pickIdx=0; }
+    else if(key==='mets'){
+      state.mets=parseFloat(v);
+      const c=$('#metsCell'); if(c) c.textContent=`${METS_LABEL[v]}・実効METs ${state.mets.toFixed(2)}）`;
+    }
+    else if(key==='stay'){ state.stay=parseInt(v,10); }
+    render();
+  });
+}
+['chipPlace','chipMets','chipStay'].forEach(wireChips);
+$('#bw').addEventListener('change',e=>{
+  let v=parseFloat(e.target.value);
+  if(!isFinite(v)) v=15;
+  v=Math.min(Math.max(v,12),22);
+  e.target.value=v; state.bw=v; render();});
+/* ★ 2026-08-22：滞在時間。全候補に等しく効くので③の順位は動かないが、②の目安mLは動く。 */
+$('#pickBtn').onclick=()=>{
+  const w=$('#pickWrap');w.classList.toggle('hidden');
+  if(!w.classList.contains('hidden')){
+    if(!MP){
+      MP=makeMap($('#pickMap'),{onTap:([x,y])=>{
+        state.x=x;state.y=y;lastKey='';
+        const near=nearestLabel(x,y);
+        $('#originLabel').textContent=near?`${near.n} のあたり`:'地図で指定した場所';
+        render();}});
+      MP.interactive(()=>paintPick());
+      drawPick(true);
+    }else drawPick(false);
+  }
+};
+/* 出発地の説明に、いちばん近い目印の名前を使う。緯度経度の数字より読める */
+function nearestLabel(x,y){
+  if(!D_.labels)return null;
+  let best=null,bd=260;
+  for(const l of D_.labels){const d=Math.hypot(l.x-x,l.y-y);if(d<bd){bd=d;best=l;}}
+  return best;
+}
+$('#geo').onclick=()=>{
+  if(!navigator.geolocation){alert('この端末では現在地が使えません');return;}
+  const b=$('#geo');b.textContent='取得中…';b.disabled=true;
+  navigator.geolocation.getCurrentPosition(p=>{
+    const q=ll2xy(p.coords.latitude,p.coords.longitude);state.x=q.x;state.y=q.y;lastKey='';
+    $('#originLabel').textContent=`現在地（誤差 約${Math.round(p.coords.accuracy)}m）`;
+    b.textContent='現在地';b.disabled=false;render();},
+    err=>{b.textContent='現在地';b.disabled=false;
+      alert('現在地が取れませんでした。'+(location.protocol==='http:'&&location.hostname!=='localhost'
+        ?'https でないとブラウザが位置情報を渡しません。':err.message));},
+    {enableHighAccuracy:true,timeout:8000});
+};
+$('#live').onclick=async()=>{
+  const b=$('#live');b.textContent='取得中…';b.disabled=true;
+  try{
+    const now=new Date(),p=n=>String(n).padStart(2,'0');
+    const d=`${now.getFullYear()}${p(now.getMonth()+1)}${p(now.getDate())}`;
+    const get=async(no,dt)=>{
+      const r=await fetch(`https://www.wbgt.env.go.jp/api/v1/getSurveyData?data_type=${dt}`
+        +`&location_type=1&wbgt_nos=${no}&date_from=${d}000000&date_to=${d}235959`);
+      const j=await r.json();
+      const rows=(j.data||[]).filter(x=>x.wbgt_WO!==null);
+      return rows.length?{v:parseFloat(rows[rows.length-1].wbgt_WO),t:rows[rows.length-1].wbgt_date}:null;};
+    const [ne,tk]=await Promise.all([get(44071,0),get(44132,1)]);
+    const cand=[ne,tk].filter(Boolean);
+    if(!cand.length) throw new Error('値が空でした');
+    const top=cand.reduce((a,x)=>x.v>a.v?x:a);
+    state.wbgt=top.v;$('#wbgt').value=top.v;$('#wbgtV').textContent=top.v.toFixed(1);
+    /* ★ 2026-08-22：スライダーを details の中へ畳んだので、取り込みの結果は
+       畳まれていない #liveSrc に出す（#wbgtSrc に書くと閉じている間は見えない）。 */
+    $('#liveSrc').textContent=`${top.t} 時点の実況値です（環境省。練馬 ${ne?ne.v:'—'} と 東京 ${tk?tk.v:'—'} の高い方）。`
+      +'豊島区内に観測地点はありません。練馬は実況推定値です。';
+    b.textContent='いまの暑さ指数を取り込む';b.disabled=false;render();
+  }catch(e){b.textContent='取り込めませんでした';b.disabled=false;
+    $('#liveSrc').textContent='実況値を取れませんでした。スライダーで指定してください。';}
+};
+
+/* 環境省の暑さ指数を時刻ごとに当てる。
+   ★ 2026-08-22：予測APIは「これから先」しか返さない。9時台に押すと今日の09時が無く、
+     「そろっていません」で失敗していた。過ぎた時刻は実況（getSurveyData）で埋める。
+   ［実見］予測は3時間刻み・forecast_val は10倍値。実況は1時間刻み・wbgt_WO を使う。 */
+/* ★ 2026-08-22：既定を「今日の実況＋予測」に変えた。
+   ①が「今日、行ける時刻はあるか」と問うのに、既定が去年8月の平均時刻差（WOFF）なのは筋が通らない。
+   ［実測］WOFF は31日中21日で「16時が最良」になり、39%の日で推奨時刻が真値と食い違う。
+   ★ 取れないときは WOFF のままにして、その旨を画面に出す（フォールバックは従来どおり）。
+   ★ `?fixed=1` を付けると自動取得しない。キャプチャとリハーサルで数字を固定するため
+     （submit_caps_v1c.py が使う）。旧 `?woff=1` も当面は受ける。
+     ★ 2026-08-22：`woff` は Web フォント形式（.woff）と紛らわしいので `fixed` に改名した。 */
+const _q = new URLSearchParams(location.search);
+const NO_AUTO_FC = _q.has('fixed') || _q.has('woff');
+async function useForecast(auto){
+  const b=$('#fc');
+  if(state.fc){state.fc=null;b.textContent='今日の値に戻す';b.classList.remove('on');
+    $('#fcSrc').innerHTML='いま使っているのは <b>去年8月の平均時刻差</b> です'
+      +'（2025年8月・3地点・31日の実測から作った、13時を基準にした時刻差）。'
+      +'各行の ± はそのばらつきです。';
+    render();return;}
+  b.textContent='取得中…';b.disabled=true;
+  try{
+    const now=new Date(),p=n=>String(n).padStart(2,'0');
+    const d0=`${now.getFullYear()}${p(now.getMonth()+1)}${p(now.getDate())}`;
+    const d1=new Date(now.getTime()+86400000);
+    const d1s=`${d1.getFullYear()}${p(d1.getMonth()+1)}${p(d1.getDate())}`;
+
+    /* 1) 実況（今日ぶん・1時間刻み）。練馬は実況推定値・東京は実況実測値で data_type が違う */
+    const act={};
+    const get=async(no,dt)=>{
+      const r=await fetch('https://www.wbgt.env.go.jp/api/v1/getSurveyData'
+        +`?data_type=${dt}&location_type=1&wbgt_nos=${no}&date_from=${d0}000000&date_to=${d0}235959`);
+      const j=await r.json();
+      for(const x of (j.data||[])){
+        if(x.wbgt_WO===null||x.wbgt_WO==='') continue;
+        const hh=+x.wbgt_date.slice(11,13);
+        act[hh]=Math.max(act[hh]??-99, parseFloat(x.wbgt_WO));}
+    };
+    await Promise.all([get(44071,0).catch(()=>{}), get(44132,1).catch(()=>{})]);
+
+    /* 2) 予測（今日ぶん・3時間刻み） */
+    const uf='https://www.wbgt.env.go.jp/api/v1/getForecastData'
+      +'?location_type=1&wbgt_nos=44071&wbgt_nos=44132&date_search_type=1'
+      +`&range_date_from=${d0}000000&range_date_to=${d1s}000000`;
+    const jf=await (await fetch(uf)).json();
+    const rows=(jf.data||[]).filter(x=>x.forecast_time.slice(0,10).replace(/\//g,'')===d0);
+    let ref='';for(const x of rows) if(x.reference_time>ref) ref=x.reference_time;
+    const fc={};
+    for(const x of rows){ if(x.reference_time!==ref) continue;
+      const hh=+x.forecast_time.slice(11,13);
+      fc[hh]=Math.max(fc[hh]??-99,(+x.forecast_val)/10);}
+
+    /* 3) 節点を作る。実況があればそれを優先（過ぎた時刻は実測が正しい） */
+    const node={};
+    for(const h of [9,12,15,18]){ if(fc[h]!=null) node[h]=fc[h]; }
+    for(const h in act){ node[+h]=act[+h]; }
+    const ks=Object.keys(node).map(Number).sort((a,b)=>a-b);
+    if(ks.length<2) throw new Error('実況も予測も取れませんでした');
+
+    /* 4) 11〜16時を作る。実況があればそのまま、無ければ節点から線形内挿（両端は最寄りで一定） */
+    const at=(h)=>{
+      if(act[h]!=null) return act[h];
+      if(h<=ks[0]) return node[ks[0]];
+      if(h>=ks[ks.length-1]) return node[ks[ks.length-1]];
+      let i=0; while(ks[i+1]<h) i++;
+      const a=ks[i],b2=ks[i+1];
+      return node[a]+(node[b2]-node[a])*((h-a)/(b2-a));
+    };
+    const src={}; state.fc={};
+    for(const h of [11,12,13,14,15,16]){
+      state.fc[h]=Math.round(at(h)*10)/10;
+      src[h]=act[h]!=null?'実況':'予測';
+    }
+    state.wbgt=Math.round(state.fc[13]*10)/10;
+    $('#wbgt').value=state.wbgt;$('#wbgtV').textContent=state.wbgt.toFixed(1);
+    b.textContent='去年8月の平均に戻す';b.classList.add('on');b.disabled=false;
+    const nAct=Object.values(src).filter(v=>v==='実況').length;
+    $('#fcSrc').innerHTML=`いま使っているのは <b>今日の暑さ指数</b> です。`
+      +`環境省・練馬と東京の高い方で、過ぎた${nAct}時刻は実況、`
+      +`残りは${ref?ref+' 発表の':''}予測（3時間刻みなので11・13・14・16時は内挿）。`;
+    render();
+  }catch(e){state.fc=null;b.textContent='今日の値に戻す';b.disabled=false;
+    $('#fcSrc').innerHTML='<b>★ 今日の暑さ指数を取れませんでした。</b>'
+      +'いまは去年8月の平均時刻差で計算しています。各行の ± はそのばらつきです。'
+      +(auto?'':'（'+e.message+'）');
+    render();}
+}
+$('#fc').onclick=()=>useForecast(false);
+
+/* ===================== 起動 ===================== */
+(async()=>{
+  try{
+    await load();
+    K=new Kokage(D_.bundle);
+    AF=fitAffine(D_.bundle.nodes);
+    for(const p of K.b.parks){const q=ll2xy(p.lat,p.lon);p.x=q.x;p.y=q.y;}
+    idxLinks();
+    const o=ll2xy(35.72950,139.71150);state.x=o.x;state.y=o.y;
+    $('#wbgtV').textContent=state.wbgt.toFixed(1);
+    /* 動作確認から出発地を差し替えるための入口（submit_caps_v1c.py と検証スクリプトが使う） */
+    window.kokage={state, render, ll2xy, xy2ll, setOrigin(lat,lon){
+      const q=ll2xy(lat,lon); state.x=q.x; state.y=q.y; lastKey=''; return render();}};
+    await render();
+    /* ★ 2026-08-22：まず WOFF で描いてから、今日の実況＋予測に差し替える。
+       先に描くのは、APIが遅い／届かない環境でも画面が出るようにするため。 */
+    if(!NO_AUTO_FC) useForecast(true);
+    else $('#fcSrc').innerHTML='いま使っているのは <b>去年8月の平均時刻差</b> です'
+      +'（2025年8月・3地点・31日の実測から作った、13時を基準にした時刻差）。'
+      +'各行の ± はそのばらつきです。';
+  }catch(e){
+    const b=$('#boot');b.classList.remove('hidden');
+    b.innerHTML=`読み込みに失敗しました：${e.message}<br>同じフォルダの JSON を読みます。`
+      +`<code>python -m http.server 8000</code> を実行して <code>http://localhost:8000/</code> から開いてください。`;
+    console.error(e);
+  }
+})();
+</script>
+</body>
+</html>
