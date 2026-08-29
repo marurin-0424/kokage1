@@ -3,6 +3,13 @@
 <title>こかげ — 今日、どこへ連れて行くか</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="夏の午後、3〜5歳を連れてどこで遊ばせるか。建物と高架の影から道の日陰を計算し、いつ・どこへ・どの道で行くかを出します。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23eb6834%22/%3E%3Cpath d=%22M32 0 L32 32 L0 32 Z%22 fill=%22%232a78d6%22/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="こかげ">
+<meta property="og:title" content="こかげ — 子どもの夏を、楽しく安全に">
+<meta property="og:description" content="建物と高架の影から歩道の日陰を計算し、いつ・どこへ・どの道で行くかを出します。都知事杯オープンデータ・ハッカソン2026 応募作品。">
+<meta property="og:url" content="https://marurin-0424.github.io/kokage1/">
+<meta name="twitter:card" content="summary">
 <style>
 :root{--surface:#fcfcfb;--plane:#f4f4f1;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
  --hair:#e1e0d9;--ring:rgba(11,11,11,.10);--sun:#eb6834;--shade:#2a78d6;--park:#1baf7a}
@@ -43,7 +50,7 @@ footer a,td a{color:var(--shade)}
 <body><div class="wrap">
 
 <div class="lg"><i class="mark"></i><h1>こ<em>か</em>げ</h1></div>
-<p class="tag">建物の影から、子連れの夏の外出を変える。</p>
+<p class="tag">子どもの夏を、楽しく安全に。</p>
 
 <div class="lead">
 <p><b>親は、勘で決めて後悔しています。</b>行ってみたら暑すぎて15分で撤退した、という日が夏には何度もあります。</p>
@@ -62,7 +69,7 @@ footer a,td a{color:var(--shade)}
 </a>
 
 <a class="card" href="./demo.html">
-  <div class="t">操作動画（33秒・無音）→</div>
+  <div class="t">操作動画（43秒・無音）→</div>
   <div class="d">実際の画面を操作しながら録画したものです。テロップ付き。</div>
   <div class="m">直接のファイルは <code>./demo.mp4</code></div>
 </a>
@@ -70,11 +77,11 @@ footer a,td a{color:var(--shade)}
 <a class="card" href="./walk-timer.html">
   <div class="t">歩行速度メジャー →</div>
   <div class="d">3〜5歳を連れた実際の分速を測ります。「歩く／止まる／信号待ち」の3ボタンを押すだけ。
-  この道具で測った <b>53.1 m/分</b>（n=3）を、いまの計算に使っています。</div>
+  この道具で測った <b>53.1 m/分</b>（同一の親子1組で3区間・170m/650m/600m）を、いまの計算に使っています。</div>
   <div class="m">スマホ向け。共有 → ホーム画面に追加 でアプリのように使えます</div>
 </a>
 
-<p class="old">開発の経過（差分の比較用に残してあります）：
+<p class="old"><b>ここから下は旧版です。数字も画面構成も現行と異なります</b>（比較のために残してあります。評価は上の「こかげ（スマホ）」でお願いします）：
 <a href="./kokage-v1b-mobile.html">v1b（4ステップ）</a>／
 <a href="./kokage-v1-mobile.html">v1</a>／
 <a href="./kokage-v0-mobile.html">v0.1（スマホ）</a>／
@@ -93,20 +100,20 @@ footer a,td a{color:var(--shade)}
 </table>
 
 <h2>使っているオープンデータ</h2>
-<p class="note">いずれも<b>「こかげ」が加工して利用</b>しています（影の計算・座標の突合・時刻差の算出）。</p>
+<p class="note">いずれも<b>丸山倫太朗が加工して利用</b>しています（影の計算・座標の突合・時刻差の算出）。</p>
 <table>
-<tr><th>建物・橋梁・地盤高</th><td>東京都3Dデジタルマップ（3D都市モデル 豊島区 2025年度版）／ <b>東京都</b> ／ CC BY 4.0 <a href="https://creativecommons.org/licenses/by/4.0/deed.ja">https://creativecommons.org/licenses/by/4.0/deed.ja</a></td></tr>
-<tr><th>歩行者ネットワーク</th><td>歩行空間ネットワークデータ（池袋駅周辺）／ 国土交通省 ／ 公共データ利用規約（第1.0版） <a href="https://www.digital.go.jp/resources/open_data/public_data_license_v1.0">https://www.digital.go.jp/resources/open_data/public_data_license_v1.0</a></td></tr>
+<tr><th>建物・橋梁・地盤高</th><td>3D都市モデル（Project PLATEAU）豊島区（2025年度）／ <b>東京都</b> ／ CC BY 4.0 <a href="https://creativecommons.org/licenses/by/4.0/deed.ja">https://creativecommons.org/licenses/by/4.0/deed.ja</a></td></tr>
+<tr><th>歩行者ネットワーク</th><td>歩行空間ネットワークデータ（池袋駅周辺）／ 国土交通省 ／ <b>CC BY 4.0</b> <a href="https://creativecommons.org/licenses/by/4.0/deed.ja">https://creativecommons.org/licenses/by/4.0/deed.ja</a></td></tr>
 <tr><th>公園・駅・施設</th><td>公共施設一覧 ／ 豊島区 ／ <b>CC BY 2.1 日本</b> <a href="https://creativecommons.org/licenses/by/2.1/jp/">https://creativecommons.org/licenses/by/2.1/jp/</a></td></tr>
 <tr><th>授乳・おむつ替え・開館時間</th><td>赤ちゃん・ふらっと一覧 ／ 東京都福祉局 ／ CC BY 4.0 <a href="https://creativecommons.org/licenses/by/4.0/deed.ja">https://creativecommons.org/licenses/by/4.0/deed.ja</a></td></tr>
-<tr><th>暑さ指数</th><td>環境省熱中症予防情報サイト（暑さ指数WBGT）／ 環境省 ／ 公共データ利用規約（第1.0版） <a href="https://www.digital.go.jp/resources/open_data/public_data_license_v1.0">https://www.digital.go.jp/resources/open_data/public_data_license_v1.0</a></td></tr>
+<tr><th>暑さ指数</th><td>環境省熱中症予防情報サイト（暑さ指数WBGT）／ 環境省 ／ <b>CC BY 4.0</b> <a href="https://creativecommons.org/licenses/by/4.0/deed.ja">https://creativecommons.org/licenses/by/4.0/deed.ja</a></td></tr>
 </table>
 <p class="note"><b>これは東京都・国土交通省・豊島区・環境省が作成したものではありません。</b></p>
 <p class="note">このほか、<b>検証にのみ</b>次の4件を使いました（答えには反映していません）：都道の街路樹（東京都建設局）は街路樹の影を実装して影響量を評価しましたが、都道のみで区道が入らないため／アメダス観測データ（気象庁）は日照時間から曇りの係数を作れるか調べましたが、時別値が取れないため／緑のオープンデータ GISデータ（東京都都市整備局）は14レイヤを実見しましたが、樹林地が公園の開園区域を対象外としており公園内の樹木が入っていないため／都営バス GTFS-JP（東京都交通局）は停留所名を公園の位置説明に使いました。</p>
 
 <h2>作っていて分かったこと</h2>
 <table>
-<tr><th>今ないデータ</th><td>公園の遊具は、東京都のオープンデータカタログ<b>9,656件のデータセットの中に1件もありません</b>（2026年8月時点）。施設のバリアフリー情報は豊島区558件に列はあるが<b>1件も入っていない</b>。歩行者ネットワーク2,196リンクで<b>エレベーターありは0本</b></td></tr>
+<tr><th>今ないデータ</th><td>公園の遊具は、東京都のオープンデータカタログ<b>9,656件のデータセットの中に1件もありません</b>（2026-08-17 に CKAN API で取得した件数。タイトルに「遊具」を含むデータセットが0件という意味で、全文検索では3件ヒットしますが、いずれも遊具そのもののデータではありません。カタログの件数は日々動きます）。施設のバリアフリー情報は豊島区558件に列はあるが<b>1件も入っていない</b>。歩行者ネットワーク2,196リンクで<b>エレベーターありは0本</b></td></tr>
 <tr><th>出ているのに足りないデータ</th><td>東京都は2026年1月に<b>「緑のオープンデータ」を14レイヤ公開</b>しましたが、樹林地は<b>公園の開園区域を対象外</b>にしています。公園の中のどこに木が立っているかは、いまも分かりません</td></tr>
 <tr><th>分かるのは半分だけ</th><td>屋内の遊び場<b>66件のうち、開館時間が分かるのは29件（44%）</b>です。分からない施設には「開館時間のデータがありません」と書いています</td></tr>
 <tr><th>足りない範囲</th><td>同じ「雑司が谷」で、<b>都電の駅は収録範囲まで8m、地下鉄の駅は442m。2駅は463mしか離れていない</b></td></tr>

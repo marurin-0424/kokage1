@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>こかげ — 今日、どこへ連れて行くか</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23eb6834%22/%3E%3Cpath d=%22M32 0 L32 32 L0 32 Z%22 fill=%22%232a78d6%22/%3E%3C/svg%3E">
 <style>
 :root{--surface:#fcfcfb;--plane:#f4f4f1;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
 --hair:#e1e0d9;--sun:#eb6834;--shade:#2a78d6;--deck:#4a3aa7;--park:#1baf7a;
@@ -22,6 +23,10 @@ border-radius:999px;padding:2px 9px;margin-bottom:8px;letter-spacing:.06em}
 h2{font-size:17px;margin:0 0 4px}
 .lead{font-size:13px;color:var(--ink2);margin:0 0 12px}
 .note{font-size:11.5px;color:var(--muted);line-height:1.6;margin:10px 0 0}
+/* ★ 2026-08-29：地図の権利表記は折りたたみの中に置かない（事務局指摘 2026-08-25 の再発防止）。
+   地図が描かれるすべてのキャンバスの直下に、常時表示で置く。 */
+.cred{font-size:10.5px;color:var(--ink2);border-top:1px dotted var(--hair);padding-top:6px}
+.cred a{color:var(--shade)}
 .warn{background:#fff8e6;border:1px solid var(--warning);border-radius:10px;padding:10px 12px;font-size:13px;margin:0 0 12px}
 .crit{background:#fdecec;border:1px solid var(--critical);border-radius:10px;padding:10px 12px;font-size:13px;margin:0 0 12px;color:#8a1c1c}
 
@@ -150,7 +155,7 @@ th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertic
 <div class="wrap">
 <header>
   <div class="logo">こ<b style="color:var(--park)">か</b>げ</div>
-  <div class="tag">建物の影から、子連れの外出をすこし楽にする</div>
+  <div class="tag">子どもの夏を、楽しく安全に</div>
 </header>
 
 <div id="boot" class="boot hidden"></div>
@@ -168,6 +173,7 @@ th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertic
   <div class="pickwrap hidden" id="pickWrap">
     <canvas id="pickMap" width="720" height="480"></canvas>
     <p class="note">タップで出発地、ドラッグで移動、ピンチ／ホイールで拡大縮小、ダブルタップで元に戻ります。白く伏せた外側は計算できません（歩行空間ネットワークから200mまで）。灰色は建物、青灰色の線は歩ける道です。</p>
+    <p class="note cred">地図：次の4点を丸山倫太朗が加工して作成しました。3D都市モデル（Project PLATEAU）豊島区（2025年度）／東京都／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／歩行空間ネットワークデータ（池袋駅周辺）／国土交通省／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／公共施設一覧／豊島区／<a href="https://creativecommons.org/licenses/by/2.1/jp/" target="_blank" rel="noopener">CC BY 2.1 日本</a>／赤ちゃん・ふらっと一覧／東京都福祉局／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>。東京都・国土交通省・豊島区が作成したものではありません。</p>
   </div>
 
   <!-- ★ 2026-08-23：条件の順番を「どこから→どこで→どんな遊び方→どれくらい遊ぶ→体重」に並べ替え、
@@ -277,6 +283,7 @@ th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertic
   <h2 id="h3">どこに行きますか？</h2>
   <p class="lead" id="lead3">往復と滞在で失われる水分量が少ないと推測される順に、3つご提案します。お子様が日陰で遊んでくれそうか、どこが影になるかを見てみてください。</p>
   <div class="cards" id="cards"></div>
+  <p class="note cred">地図：次の2点を丸山倫太朗が加工して作成しました。3D都市モデル（Project PLATEAU）豊島区（2025年度）／東京都／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／歩行空間ネットワークデータ（池袋駅周辺）／国土交通省／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>。東京都・国土交通省が作成したものではありません。</p>
   <p class="note" id="n3">★ 図の青は建物と高架の影です。樹木の影は入っていません。公園の日陰は実際には樹木が作っていることが多く、現地で確かめたところ、この図は日陰を 9〜32ポイント少なく見ています。割合の数字は出していません。形だけを見てください。</p>
 </section>
 
@@ -291,6 +298,7 @@ th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertic
     <span><i style="background:var(--park)"></i>行き先</span>
   </div>
   <p class="note">ドラッグで移動、ピンチ／ホイールで拡大縮小、ダブルタップで元の範囲に戻ります。拡大すると郵便局や交番まで出ます。</p>
+  <p class="note cred">地図：次の4点を丸山倫太朗が加工して作成しました。3D都市モデル（Project PLATEAU）豊島区（2025年度）／東京都／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／歩行空間ネットワークデータ（池袋駅周辺）／国土交通省／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／公共施設一覧／豊島区／<a href="https://creativecommons.org/licenses/by/2.1/jp/" target="_blank" rel="noopener">CC BY 2.1 日本</a>／赤ちゃん・ふらっと一覧／東京都福祉局／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>。東京都・国土交通省・豊島区が作成したものではありません。</p>
   <p class="note" id="r4"></p>
   <ol class="steps" id="turns"></ol>
   <a class="gmap" id="gmap" target="_blank" rel="noopener">Googleマップで開く</a>
@@ -303,7 +311,7 @@ th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertic
 <table>
 <tr><th>項目</th><th>中身</th></tr>
 <tr><td>影</td><td>建物 LOD2 実形状585棟＋LOD1、高架デッキ679面。樹木は入っていません</td></tr>
-<tr><td>歩行速度</td><td>53.1 m/分（3〜5歳連れの実測・n=3）</td></tr>
+<tr><td>歩行速度</td><td>53.1 m/分（3歳児を連れて本人が実測。同一の親子1組で3区間・170m/650m/600m・51.6〜54.5 m/分を距離で加重）</td></tr>
 <tr><td>遊び方</td><td id="metsCell">走り回る中心（走る75%・実効METs 4.90）</td></tr>
 <tr><td>暑さ指数</td><td><b>既定は今日の値です。</b>環境省（練馬と東京の高い方）の、過ぎた時刻は実況、これからの時刻は予測（3時間刻みなので11/13/14/16時は内挿）。<b>取れないときは去年8月の平均時刻差（−0.22〜−1.38℃・ばらつき±1.0〜1.5℃）に戻り、その旨を画面に出します。</b>スライダーで手動の上書きもできます</td></tr>
 <tr><td>精度</td><td>L1＝歩行空間ネットワーク上／L3＝最後の数百mが直線距離からの概算</td></tr>
@@ -312,7 +320,7 @@ th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertic
 </table>
 </details>
 
-<details><summary>利用データ（5件・提供者とライセンス）</summary>
+<details open><summary>利用データ・出典（5件・提供者とライセンス）</summary>
 <!-- ★ overflow-wrap：ライセンスURLが長いので、幅430pxで横にはみ出さないようにする -->
 <div style="font-size:12px;line-height:1.8;overflow-wrap:anywhere">
   <!-- ★ 2026-08-23：事実監査で不足が出たので書き換えた。変更点は4つ。
@@ -326,22 +334,38 @@ th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertic
            明文で要求している。「加工して利用しています」だけでは「誰が」が無い。
        (3) 環境省を正式名称「環境省熱中症予防情報サイト」にした（tos.php の出典記載例）。
        (4) 「公共データ利用規約（第1.0版）」を全角括弧の正式表記にした。
+       ★★ 2026-08-29：歩行空間ネットワークと環境省の2件を、表記上
+          「公共データ利用規約（第1.0版）」から「CC BY 4.0」に変えた。
+          根拠は同規約 1.7(3)（原典を確認）：
+            「本利用ルールは、クリエイティブ・コモンズ・ライセンスの表示4.0 国際ライセンス
+              …と互換性があります。国…は、本利用ルールが適用される本コンテンツについて、
+              利用者がCC BYに従って利用することを許諾します。」
+          ＝ 互換であるだけでなく、CC BY での利用が明文で許諾されている。
+          配布ページ側の表示ラベルは PDL1.0 のままなので、そちらを見た人が
+          食い違いに見えないよう、根拠をここに残す。
+          提出資料（kokage_slides_20260825_fin.pptx）も CC BY 4.0 表記で揃っている。
        ★ 最後の1文は、CC BY 4.0 と東京都オープンデータ利用規約 2(1)イ が禁じる
           「提供元が作成したかのような態様」を避けるためのもの。
-       ★ 東京都3Dデジタルマップの提供者を「東京都」としているのは、
-          zip 内 metadata/udx_13116_pref_2025_op.xml の実見による：
+       ★★ 2026-08-29：データ名を提出資料（kokage_slides_20260825_fin.pptx）に合わせて
+          「3D都市モデル（Project PLATEAU）豊島区（2025年度）」にした。
+          手元の実体は東京都カタログ配布の
+          13116_toshima-ku_pref_2025_citygml_1_op.zip で、そちらの正式名称は
+          「東京都3Dデジタルマップ」。入口は違うが、この豊島区分のライセンスは
+          どちらの入口でも CC BY 4.0。
+          提供者を「東京都」としている根拠は、
+          zip 内 metadata/udx_13116_pref_2025_op.xml の実見：
             <title>東京都3Dデジタルマップ_13116_pref_2025_op</title>
             <useLimitation>Licensed under CC BY 4.0</useLimitation>
             <organisationName>東京都都市整備局都市づくり政策部広域調整課</organisationName>
           権利表記があるので PLATEAU Site Policy の「権利表記が無い限り PDL1.0」には
           当たらず、CC BY 4.0 が直接適用される。lineage の「東京都以外が整備した範囲」に
           豊島区は入っていない。 -->
-  <div>答えに反映しているデータ（いずれも「こかげ」が加工して利用しています）</div>
-  <div>・東京都3Dデジタルマップ（3D都市モデル 豊島区 2025年度版）／東京都／CC BY 4.0 <a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">https://creativecommons.org/licenses/by/4.0/deed.ja</a></div>
-  <div>・歩行空間ネットワークデータ（池袋駅周辺）／国土交通省／公共データ利用規約（第1.0版） <a href="https://www.digital.go.jp/resources/open_data/public_data_license_v1.0" target="_blank" rel="noopener">https://www.digital.go.jp/resources/open_data/public_data_license_v1.0</a></div>
+  <div>答えに反映しているデータ（いずれも丸山倫太朗が加工して利用しています）</div>
+  <div>・3D都市モデル（Project PLATEAU）豊島区（2025年度）／東京都／CC BY 4.0 <a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">https://creativecommons.org/licenses/by/4.0/deed.ja</a></div>
+  <div>・歩行空間ネットワークデータ（池袋駅周辺）／国土交通省／CC BY 4.0 <a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">https://creativecommons.org/licenses/by/4.0/deed.ja</a></div>
   <div>・公共施設一覧／豊島区／CC BY 2.1 日本 <a href="https://creativecommons.org/licenses/by/2.1/jp/" target="_blank" rel="noopener">https://creativecommons.org/licenses/by/2.1/jp/</a></div>
   <div>・赤ちゃん・ふらっと一覧／東京都福祉局／CC BY 4.0 <a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">https://creativecommons.org/licenses/by/4.0/deed.ja</a></div>
-  <div>・環境省熱中症予防情報サイト（暑さ指数WBGT）／環境省／公共データ利用規約（第1.0版） <a href="https://www.digital.go.jp/resources/open_data/public_data_license_v1.0" target="_blank" rel="noopener">https://www.digital.go.jp/resources/open_data/public_data_license_v1.0</a></div>
+  <div>・環境省熱中症予防情報サイト（暑さ指数WBGT）／環境省／CC BY 4.0 <a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">https://creativecommons.org/licenses/by/4.0/deed.ja</a></div>
   <div style="margin-top:9px"><b>これは東京都・国土交通省・豊島区・環境省が作成したものではありません。</b></div>
   <div style="margin-top:9px">ほかに4件（都道の街路樹／アメダス観測データ／緑のオープンデータ／都営バス GTFS-JP）を検証に使いましたが、この画面の答えには入っていません。</div>
 </div>
@@ -499,15 +523,43 @@ const wbgtAt=h=>{
   const f=state.fc;
   if(f&&f[h]!=null) return Math.round((f[h]+(state.wbgt-f[13]))*100)/100;
   return Math.round((state.wbgt+WOFF[h])*100)/100;};
+/* ★ 2026-08-29：起動を2段に分けた。
+   (1) 直列 await をやめて Promise.all にした。5本を順番に取っていたので、
+       回線が細いと待ち時間がそのまま足し算になっていた。
+   (2) 建物のフットプリント（map_foot.json・2.5MB・起動時取得の8割）を
+       critical path から外した。エンジンは使っておらず、
+       使うのは地図の描画だけ（drawPark / ルート地図 / 出発地の地図）。
+       (3) 既定の時刻（13時）の影を、起動と同時に先読みするようにした。
+           ②の行き先を出すのに要るのがこれで、いちばん重い。
+       ［実測 2026-08-29・slow4G 1.6Mbps/RTT150・CPU x4・gzip配信］
+       ②の行き先が出るまで 7.0秒 → 3秒台。建物は後から届いて描き足される。
+   poly() は polys が undefined なら何もしないので、届く前に描いても落ちない。 */
+let footReady=null;
 async function load(){
-  const f={bundle:'kokage_graph.json',links:'map_links.json',foot:'map_foot.json',
+  const f={bundle:'kokage_graph.json',links:'map_links.json',
            parks:'map_parks.json',labels:'map_labels.json'};
-  for(const [k,v] of Object.entries(f)){const r=await fetch(v);
-    if(!r.ok) throw new Error(v+' ('+r.status+')'); D_[k]=await r.json();}
+  const ent=Object.entries(f);
+  const got=await Promise.all(ent.map(([k,v])=>fetch(v).then(r=>{
+    if(!r.ok) throw new Error(v+' ('+r.status+')'); return r.json();})));
+  ent.forEach(([k],i)=>{D_[k]=got[i];});
   D_.points=D_.labels.points||[]; D_.labels=D_.labels.labels||[];
 }
-async function shadowFor(h){if(!D_.shadow[h]){const r=await fetch(`map_shadow_${h}.json`);
-  D_.shadow[h]=r.ok?await r.json():[];} return D_.shadow[h];}
+/* 既定の時刻の影だけ、起動と同時に取りにいく（②の行き先を出すのに要る） */
+function prefetchShadow(h){ if(!D_.shadow[h]) shadowFor(h).catch(()=>{}); }
+/* 建物は最初の描画が終わってから取りにいく（帯域を影と取り合わせない） */
+function loadFoot(){ if(footReady) return footReady;
+  footReady=fetch('map_foot.json').then(r=>r.ok?r.json():[]).then(j=>{D_.foot=j;})
+    .catch(()=>{D_.foot=[];});
+  return footReady; }
+/* ★ 2026-08-29：結果ではなく Promise を覚える。
+   先読みと render() の呼び出しが重なると、解決前は D_.shadow[h] が未設定なので
+   同じ 1MB を2回取りにいっていた。 */
+const shadowP={};
+function shadowFor(h){
+  if(D_.shadow[h]) return Promise.resolve(D_.shadow[h]);
+  if(!shadowP[h]) shadowP[h]=fetch(`map_shadow_${h}.json`)
+    .then(r=>r.ok?r.json():[]).then(j=>{D_.shadow[h]=j;return j;});
+  return shadowP[h];}
 
 function fitAffine(N){
   const n=N.lat.length;let sl=0,so=0,sx=0,sy=0;
@@ -896,7 +948,9 @@ function renderHours(st){
       +`<span class="bar"><i style="width:${sh.toFixed(0)}%"></i></span></span>`
       +`<span class="s">${mlHtml}<span class="sub">${subTxt}</span><span class="sub">暑さ指数 ${st[h].wbgt.toFixed(1)}${(!state.fc&&WSD[h])?'±'+WSD[h].toFixed(1):''}</span></span>`
       +`<span class="ch">›</span>`;
-    b.onclick=()=>{state.hour=h;render();document.getElementById('step2').scrollIntoView();};
+    /* ★ 2026-08-29（C53）：render() は async。await しないと、影JSONの取得中に
+       ②のカードが未描画のままスクロールが走り、行き先を飛び越える。 */
+    b.onclick=async()=>{state.hour=h;await render();document.getElementById('step2').scrollIntoView();};
     w.appendChild(b);
   }
   /* ★ 2026-08-23：「◯時に出るより…」の1行は削除（丸山さん指示）。
@@ -953,7 +1007,7 @@ async function renderCards(res){
       +`<span style="color:var(--muted)">（往復 ${Math.round(t.move)} ＋ 滞在${state.stay}分 ${Math.round(t.stay)}）</span></div>`
       +(t.indoor?hoursHtml(t.name):'');
     btn.appendChild(body);
-    btn.onclick=()=>{state.pickIdx=i;render();document.getElementById('step3').scrollIntoView();};
+    btn.onclick=async()=>{state.pickIdx=i;await render();document.getElementById('step3').scrollIntoView();};
     c.appendChild(btn);
     if(cv) drawPark(cv,t,sh);
   });
@@ -1254,7 +1308,7 @@ function setPlace(v){
 }
 $('#toIndoor').onclick=()=>{setPlace('in');render();};
 /* ★ 2026-08-23：一部の時刻だけ31以上の日の入口。押したあと6行が見える位置へ。 */
-$('#toIndoorPartial').onclick=()=>{setPlace('in');render();$('#step1').scrollIntoView();};
+$('#toIndoorPartial').onclick=async()=>{setPlace('in');await render();$('#step1').scrollIntoView();};
 $('#forceHours').addEventListener('toggle',()=>render());
 /* ★ 2026-08-22：遊び方と体重。既定のままなら数字は動かない。 */
 const METS_LABEL={'5.80':'ずっと走っている（走る100%','4.90':'走り回る中心（走る75%',
@@ -1434,6 +1488,8 @@ $('#fc').onclick=()=>useForecast(false);
 /* ===================== 起動 ===================== */
 (async()=>{
   try{
+    /* 影は load() を待たずに走らせる（②の行き先を出すのに要る、いちばん重いファイル） */
+    prefetchShadow(state.hour);
     await load();
     K=new Kokage(D_.bundle);
     AF=fitAffine(D_.bundle.nodes);
@@ -1445,6 +1501,9 @@ $('#fc').onclick=()=>useForecast(false);
     window.kokage={state, render, ll2xy, xy2ll, setOrigin(lat,lon){
       const q=ll2xy(lat,lon); state.x=q.x; state.y=q.y; lastKey=''; return render();}};
     await render();
+    /* ★ 2026-08-29：最初の描画が終わってから建物を取り、届いたら描き足す
+       （届かなくても画面は成立する） */
+    loadFoot().then(()=>render()).catch(()=>{});
     /* ★ 2026-08-22：まず WOFF で描いてから、今日の実況＋予測に差し替える。
        先に描くのは、APIが遅い／届かない環境でも画面が出るようにするため。 */
     if(!NO_AUTO_FC) useForecast(true);
