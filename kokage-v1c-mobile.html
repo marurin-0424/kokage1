@@ -29,6 +29,14 @@ h2{font-size:17px;margin:0 0 4px}
 .cred a{color:var(--shade)}
 .warn{background:#fff8e6;border:1px solid var(--warning);border-radius:10px;padding:10px 12px;font-size:13px;margin:0 0 12px}
 .crit{background:#fdecec;border:1px solid var(--critical);border-radius:10px;padding:10px 12px;font-size:13px;margin:0 0 12px;color:#8a1c1c}
+/* ★ 2026-08-29（P23）：範囲外は「答えられません」で終わらせず、
+   なぜ答えられないのか＝データ側の穴を、その場で読める形にする。 */
+.critnote{display:block;margin-top:10px;padding-top:9px;border-top:1px solid #f2c9c9;color:#6b4a4a;line-height:1.6}
+.critbtn{display:block;width:100%;margin-top:10px;padding:10px;font-size:13.5px;font-weight:700;
+ border-color:#e3aeae;color:#8a1c1c}
+.crit details{background:transparent;border:0;border-radius:0;padding:0;margin:0}
+.crit summary{font-size:12.5px;color:#8a1c1c}
+.crit details p{margin:7px 0 0}
 
 /* 出発地バー */
 .orig{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:12px 14px;margin:10px 0 0}
@@ -380,6 +388,13 @@ th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertic
 const C={DELTA_WBGT_SHADE:-2.0,DELTA_WBGT_CHILD_NORMAL:0.3,DELTA_WBGT_CHILD_HARSH:2.0,
 WBGT_INDOOR:25.0,SR_REF_ML_PER_MIN:10.8,BW_REF_KG:60.0,METS_REF:3.0,WBGT_REF:28.0,
 BETA_PER_DEG:0.165,BSA_EXPONENT:2/3,K_CHILD:1.0,GATE_WBGT:31.0,
+/* ★ 2026-08-30（P35）：DETOUR（直線距離→実距離の迂回係数）は 1.3。
+   ［事実］[R-19] 腰塚・小林(1983)「In Urban areas, R = 1.3u」。傍証は理論値 4/π=1.273 と
+   森田ら(2014) 日本112都市の実測平均 1.3035。
+   ★ この街の歩行空間ネットワーク上でも実測した（`src/detour_measure.mjs`）：
+     実経路長÷直線距離の中央値 1.291（n=89,427・IQR 1.174〜1.440）＝文献値と一致。値は据え置き。
+   ★ 出力での感度：1位は 1.05〜1.50 の全域で不変（出発地4点）。2〜3位は 1.26・1.28・1.38 に
+     境界があり、既定 1.3 は境界から 0.02 しか離れていない。 */
 SPEED_M_PER_MIN:53.1,SNAP_M:80.0,ORIGIN_MAX:200.0,FALLBACK_M:400.0,DETOUR:1.3,
 METS:{walk_slow:2.8,stand:1.8,sit:1.3,play_active:5.8,play_light:2.8,play_sit:2.2}};
 const effWbgt=(base,{sunlit,harsh=true,indoor=false},f=1)=>{
@@ -1191,9 +1206,30 @@ async function render(){
     if(probe.error==='outside'){
       const w=$('#outside');
       w.classList.remove('hidden');
-      w.innerHTML=`この地点は計算できません。歩行空間ネットワーク（池袋駅周辺 約2.5km×1.1km）の外で、`
-        +`いちばん近い道まで <b>約${Math.round(probe.dist)}m</b> あります。`
-        +`地図の細い線が引かれている範囲をお選びください。`;
+      /* ★ 2026-08-29（P23）：ここは「歩行空間ネットワークが都内17地区しかない」を
+         利用者が自分で踏んだ瞬間に読める、いちばん自然な場所。
+         ［事実］更新日が分かる12地区のうち11地区は2018/06〜2021/05 で止まっており、
+         2022年以降に更新されたのは赤羽駅周辺（2026/03）だけ。池袋は2019/01。 */
+      w.innerHTML=`<b>この地点は、官公庁・自治体が公開するデータ範囲の関係で、まだ結果をお出しできません。</b>`
+        +`<button class="critbtn" id="outsidePick">地図で範囲を見る</button>`
+        +`<span class="critnote"><details><summary>詳細</summary>`
+        +`<p>こかげでは、最適なルートを計算するために、歩道の段差・幅員・階段まで分かる`
+        +`「歩行空間ネットワークデータ」（国土交通省）を活用しています。`
+        +`本データが整備されているのは東京都内で17地区に限られ、こかげは現在、`
+        +`そのうち池袋駅周辺にのみ対応しています（順次拡大予定）。</p>`
+        +`<p>なお、更新日が分かる12地区のうち11地区は2018〜2021年で更新が止まっており、`
+        +`池袋周辺の最終更新も2019年1月となっております。</p>`
+        +`</details></span>`;
+      /* 「地図で範囲を見る」→ 出発地の地図を開き、**答えられる範囲の全体**が入る倍率に引く。
+         既定の drawPick(true) は出発地の±450mに寄るので、白く伏せた境界が画面の外に出てしまい、
+         「範囲がどこか分からない」ままになる。この入口から開いたときだけ全体に合わせる。 */
+      $('#outsidePick').onclick=async()=>{
+        const pw=$('#pickWrap');
+        pickWide=true;
+        if(pw.classList.contains('hidden')) $('#pickBtn').click();
+        else await drawPick(true);
+        pw.scrollIntoView({block:'center',behavior:'smooth'});
+      };
       if(state.prev){state.x=state.prev.x;state.y=state.prev.y;
         $('#originLabel').textContent=state.prev.label;
         busy=false; keepWarn=true; await render(); keepWarn=false;
@@ -1223,10 +1259,23 @@ async function render(){
 }
 
 /* ===================== 出発地を選ぶ地図 ===================== */
+let pickWide=false;   /* 範囲外の案内から開いたときだけ true。範囲の全体を見せる */
 async function drawPick(refit){
   const m=MP; if(!m)return;
   m.shadow=await shadowFor(state.hour);
-  if(refit){m.fit([[state.x-450,state.y-450],[state.x+450,state.y+450]],0);m.setHome();}
+  if(refit){
+    /* ★ pickWide のときは、答えられる範囲の全体が入る倍率に引く（範囲外の案内から開いたとき）。
+       既定は出発地の±450m。 */
+    if(pickWide){
+      const N=K.b.nodes; let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+      for(let i=0;i<N.x.length;i++){
+        if(N.x[i]<x0)x0=N.x[i]; if(N.x[i]>x1)x1=N.x[i];
+        if(N.y[i]<y0)y0=N.y[i]; if(N.y[i]>y1)y1=N.y[i];}
+      m.fit([[x0,y0],[x1,y1]],26);
+    }else m.fit([[state.x-450,state.y-450],[state.x+450,state.y+450]],0);
+    pickWide=false;      /* ★ 使ったらここで倒す。呼び出し側で倒すと await をまたげない */
+    m.setHome();
+  }
   paintPick();
 }
 /* ★ 計算できるのは歩行空間ネットワークから200m以内だけ。
@@ -1246,6 +1295,107 @@ function coverageVeil(m){
   oc.fill();
   m.ctx.drawImage(off,0,0);
 }
+/* ★ 2026-08-31：答えられる範囲の「輪郭」を描く。
+   ベールは薄い白の膜（.76）なので下の地図が透けて、境界が面として認識されない。
+   判定そのもの（各ノードから ORIGIN_MAX）の外形をそのまま線にする。
+   ※ 凸包などで滑らかにしてはいけない。選べない場所が内側に見えて、押すと弾かれる。 */
+/* ★ 外形に出るノードだけを1回だけ選び出して覚える。
+   全1,887ノードで円を2度塗ると、拡大縮小のたびに 155ms かかった（実測 2026-08-31）。
+   外形に効くのは「自分の円の縁に、他のどの円にも覆われていない向きがある」ノードだけ。
+   16方向を見て判定する。格子（200m）で近傍だけ調べるので、初回の計算も一瞬で終わる。 */
+function boundaryNodes(){
+  if(K._bnd) return K._bnd;
+  const N=K.b.nodes, R=C.ORIGIN_MAX, R2=R*R, G=R, grid=new Map();
+  const key=(gx,gy)=>gx+'/'+gy;
+  for(let i=0;i<K.n;i++){
+    const k2=key(Math.floor(N.x[i]/G),Math.floor(N.y[i]/G));
+    let a=grid.get(k2); if(!a) grid.set(k2,a=[]); a.push(i);
+  }
+  const M=16, cs=[], sn=[];
+  for(let a=0;a<M;a++){cs.push(Math.cos(a*2*Math.PI/M));sn.push(Math.sin(a*2*Math.PI/M));}
+  const out=[];
+  for(let i=0;i<K.n;i++){
+    let edge=false;
+    for(let a=0;a<M&&!edge;a++){
+      const px=N.x[i]+R*cs[a], py=N.y[i]+R*sn[a];
+      const gx=Math.floor(px/G), gy=Math.floor(py/G);
+      let covered=false;
+      for(let dx=-1;dx<=1&&!covered;dx++) for(let dy=-1;dy<=1&&!covered;dy++){
+        const a2=grid.get(key(gx+dx,gy+dy)); if(!a2) continue;
+        for(const t of a2){ if(t===i) continue;
+          const ux=N.x[t]-px, uy=N.y[t]-py;
+          if(ux*ux+uy*uy<R2){covered=true;break;} }
+      }
+      if(!covered) edge=true;
+    }
+    if(edge) out.push(i);
+  }
+  return K._bnd=out;
+}
+function coverageEdge(m){
+  const N=K.b.nodes, vb=m.view(), k=m.W/m.v.span, r=C.ORIGIN_MAX*k, w=4;
+  if(r<=w+1) return;                    // 拡大しすぎて線が潰れるときは描かない
+  /* ★ 半分の解像度で描いて拡大する。円の塗りつぶしはピクセル数で効くので、
+     これだけで4分の1になる（実測 155ms → 30ms台）。線は少し柔らかくなるが、
+     破線の目安なので問題にならない。
+     ★ 抜く側（rad-w）は**全ノード**で回すこと。外形に出るノードだけで抜くと、
+     内側に覆われていない帯が残り、ありもしない「穴」の輪郭が出る（2026-08-31 に踏んだ）。 */
+  const S=0.35, BN=boundaryNodes();
+  const off=document.createElement('canvas');
+  off.width=Math.ceil(m.W*S);off.height=Math.ceil(m.H*S);
+  const oc=off.getContext('2d');
+  const circles=(rad,list)=>{
+    oc.beginPath();
+    for(const i of list){
+      if(N.x[i]<vb[0]-C.ORIGIN_MAX||N.x[i]>vb[1]+C.ORIGIN_MAX||
+         N.y[i]<vb[2]-C.ORIGIN_MAX||N.y[i]>vb[3]+C.ORIGIN_MAX)continue;
+      const q=m.proj([N.x[i],N.y[i]]), x=q[0]*S, y=q[1]*S, R=rad*S;
+      oc.moveTo(x+R,y);oc.arc(x,y,R,0,7);}
+    oc.fill();};
+  const ALL=K._all||(K._all=Array.from({length:K.n},(_,i)=>i));
+  oc.fillStyle='#8a1c1c';
+  circles(r,BN);
+  oc.globalCompositeOperation='destination-out';
+  circles(r-w,ALL);                      // 内側を抜いて、輪郭の帯だけ残す
+  /* 斜めの縞で抜いて破線にする。実線だと行政界や道路に見える */
+  const pat=document.createElement('canvas');pat.width=pat.height=7;
+  const pc=pat.getContext('2d');
+  pc.strokeStyle='#000';pc.lineWidth=4;
+  pc.beginPath();pc.moveTo(-4,3);pc.lineTo(3,-4);pc.moveTo(3,10);pc.lineTo(10,3);pc.stroke();
+  oc.fillStyle=oc.createPattern(pat,'repeat');
+  oc.fillRect(0,0,off.width,off.height);
+  m.ctx.save();m.ctx.globalAlpha=.8;m.ctx.drawImage(off,0,0,m.W,m.H);m.ctx.restore();
+}
+/* ★ 2026-08-31：伏せた側に1つだけ、境界のいちばん近くに置く。
+   面の真ん中に散らすと「どの面のことか」が読めない。線のそばに置くと関係が読める。 */
+function veilLabel(m){
+  const N=K.b.nodes, vb=m.view();
+  const TXT='この外側は選べません';
+  m.ctx.save();
+  /* 画面上では canvas(720px) が幅390px前後に縮むので、20px でようやく11px相当に見える */
+  m.ctx.font='bold 20px system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif';
+  m.ctx.textAlign='center'; m.ctx.textBaseline='middle';
+  const tw=m.ctx.measureText(TXT).width, k=m.W/m.v.span, half=(tw/2+10)/k;
+  const nx=9, ny=7, cand=[];
+  for(let j2=0;j2<ny;j2++) for(let i2=0;i2<nx;i2++){
+    const wx=vb[0]+(vb[1]-vb[0])*(i2+0.5)/nx, wy=vb[2]+(vb[3]-vb[2])*(j2+0.5)/ny;
+    let d2=Infinity;
+    for(let t=0;t<K.n;t++){const a=N.x[t]-wx,b=N.y[t]-wy;const v=a*a+b*b;if(v<d2)d2=v;}
+    const d=Math.sqrt(d2);
+    if(d<=C.ORIGIN_MAX+half) continue;          // 帯ごと外に出ていないと字が範囲にかかる
+    const q=m.proj([wx,wy]);
+    if(q[0]-tw/2<10||q[0]+tw/2>m.W-10||q[1]<28||q[1]>m.H-28) continue;
+    cand.push([d,q]);
+  }
+  cand.sort((a,b)=>a[0]-b[0]);                   // 境界にいちばん近いものを1つ
+  if(cand.length){
+    const q=cand[0][1];
+    m.ctx.lineJoin='round'; m.ctx.miterLimit=2;
+    m.ctx.lineWidth=3; m.ctx.strokeStyle='rgba(255,255,255,.95)'; m.ctx.strokeText(TXT,q[0],q[1]);
+    m.ctx.fillStyle='#8a1c1c'; m.ctx.fillText(TXT,q[0],q[1]);
+  }
+  m.ctx.restore();
+}
 
 function paintPick(){
   const m=MP; if(!m)return;
@@ -1263,6 +1413,8 @@ function paintPick(){
   const o=m.proj([state.x,state.y]);
   m.ctx.fillStyle='#0b0b0b';m.ctx.beginPath();m.ctx.arc(o[0],o[1],8,0,7);m.ctx.fill();
   m.ctx.fillStyle='#fff';m.ctx.beginPath();m.ctx.arc(o[0],o[1],3.5,0,7);m.ctx.fill();
+  coverageEdge(m);   /* ★ 建物と道を描き直したあとに置く。先に置くと線も字も半分埋まる */
+  veilLabel(m);
   m.northArrow();m.scalebar();
 }
 
