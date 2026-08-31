@@ -10,7 +10,9 @@
 import { chromium } from 'playwright';
 
 const BASE = process.argv[2] || 'http://127.0.0.1:8099/kokage-v1c-mobile.html';
-const EXPECT_ML = [638, 609, 577, 602, 482, 334];  // 既定・暑さ指数29.0（?fixed=1）
+const EXPECT_ML = [634, 610, 577, 603, 503, 334];  // 既定・暑さ指数29.0（?fixed=1）
+// ★ 2026-08-31（P38）：公園の形を東京都のポリゴンに替えたので、旧値 [638,609,577,602,482,334] から動いた。
+//   1位の顔ぶれは6時刻とも不変。差は 11時 −4／12時 +1／13時 ±0／14時 +1／15時 +21／16時 ±0。
 let ng = 0;
 const ok  = (n, c, d='') => { console.log(`${c ? 'PASS' : 'FAIL'}  ${n}${d ? '  :: ' + d : ''}`); if (!c) ng++; };
 

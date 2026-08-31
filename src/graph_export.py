@@ -57,7 +57,7 @@ def main():
             if indoor:
                 park_shade.setdefault(nm, [1000] * len(HOURS))
                 continue
-            c, gap_poly = D.park_polygon(lo, la, area)
+            c, gap_poly = D.park_polygon(lo, la, area, nm)   # ★ 2026-08-31：名前を渡す
             geom = 'luse'
             if c is None:
                 geom = 'circle'
@@ -88,7 +88,7 @@ def main():
     for kind, nm, lo, la, area, indoor in cands:
         if indoor:
             continue
-        c, _g = D.park_polygon(lo, la, area)
+        c, _g = D.park_polygon(lo, la, area, nm)   # ★ 2026-08-31：名前を渡す
         if c is None:
             continue
         key = (round(c.centroid.x, 1), round(c.centroid.y, 1))
@@ -108,10 +108,12 @@ def main():
                    shade=park_shade.get(nm, [0] * len(HOURS)))
         poly = None
         if not indoor:
-            c, _g = D.park_polygon(lo, la, area)
+            c, _g = D.park_polygon(lo, la, area, nm)   # ★ 2026-08-31：名前を渡す
             if c is not None and nm in poly_of and owner[poly_of[nm][0]][0] != nm:
                 c = None                      # ★ ポリゴンは他の公園のもの
-            rec['geom'] = 'luse' if c is not None else 'circle'
+            rec['geom'] = ('tokyo' if D._norm(nm) in D.load_tokyo_parks()
+                           or D.PARK_ALIAS.get(D._norm(nm), '') in D.load_tokyo_parks()
+                           else 'luse') if c is not None else 'circle'
             if c is None:
                 c = Point(*R.FWD.transform(lo, la)).buffer(math.sqrt(area / math.pi))
             rec['bcov'] = round(1.0 - c.difference(FOOT0).area / c.area, 3)

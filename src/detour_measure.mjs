@@ -17,8 +17,7 @@
  */
 import fs from 'fs';
 import { Kokage, C } from './kokage-engine.js';
-/* ★ 公開用コピー：バンドルは publish/ の直下（作業リポジトリでは ../out/）。値は同一です */
-const B = JSON.parse(fs.readFileSync('../kokage_graph.json', 'utf8'));
+const B = JSON.parse(fs.readFileSync('../out/kokage_graph.json', 'utf8'));
 const OFF = { 11: -0.44, 12: -0.22, 13: 0.0, 14: -0.35, 15: -0.60, 16: -1.38 };
 const MP = 4.9, BASE_WBGT = 29.0;
 const q = (a, p) => { const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(s.length * p))]; };

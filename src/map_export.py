@@ -73,7 +73,7 @@ def main():
     for kind, nm, lo, la, area, indoor in cands:
         if indoor:
             continue
-        c, _g = D.park_polygon(lo, la, area)
+        c, _g = D.park_polygon(lo, la, area, nm)   # ★ 2026-08-31：名前を渡す（都のポリゴンを引く）
         if c is None:
             c = Point(*FWD.transform(lo, la)).buffer(math.sqrt(area / math.pi))
         parks[nm] = rings(c.simplify(1.0))

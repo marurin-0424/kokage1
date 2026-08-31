@@ -103,7 +103,7 @@ def main():
     FOOT = unary_union([p.simplify(0.3) for p, h, _ in B])
     polys = {}
     for nm, (lo, la, area) in cands.items():
-        g, gap = D.park_polygon(lo, la, area)
+        g, gap = D.park_polygon(lo, la, area, nm)   # ★ 2026-08-31：名前を渡す（都のポリゴンを引く）
         if g is None:
             print('  × ポリゴン無し:', nm); continue
         polys[nm] = g
