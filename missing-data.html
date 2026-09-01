@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<title>こかげ — 今ないデータ</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="子連れの外出を1つ計算しきろうとして詰まった場所の一覧。すべて開発中に手を動かして確かめたものだけを載せています。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23eb6834%22/%3E%3Cpath d=%22M32 0 L32 32 L0 32 Z%22 fill=%22%232a78d6%22/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="こかげ">
+<meta property="og:title" content="こかげ — 今ないデータ">
+<meta property="og:description" content="作ってみたら、これだけ足りませんでした。取り下げた指摘4件も載せています。">
+<meta name="twitter:card" content="summary">
+<style>
+:root{--surface:#fcfcfb;--plane:#f4f4f1;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+ --hair:#e1e0d9;--ring:rgba(11,11,11,.10);--sun:#eb6834;--shade:#2a78d6;--park:#1baf7a}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--plane);color:var(--ink);
+ font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;font-size:16px;line-height:1.65}
+.wrap{max-width:760px;margin:0 auto;padding:28px 18px 60px}
+.lg{display:flex;align-items:center;gap:14px;margin:16px 0 4px}
+.mark{width:38px;height:38px;border-radius:10px;
+ background:linear-gradient(135deg,var(--sun) 0 50%,var(--shade) 50% 100%)}
+h1{font-size:32px;margin:0;letter-spacing:.05em}
+h1 em{color:var(--park);font-style:normal}
+.tag{font-size:15px;color:var(--ink2);margin:0 0 22px}
+.lead{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:18px 20px;margin-bottom:26px}
+.lead p{margin:0 0 8px}
+.lead p:last-child{margin:0}
+b{color:var(--ink)}
+a.card{display:block;background:var(--surface);border:1px solid var(--hair);border-radius:14px;
+ padding:18px 20px;margin-bottom:14px;text-decoration:none;color:inherit;transition:border-color .15s}
+a.card:hover{border-color:var(--ink)}
+a.card.main{border-color:var(--park);border-width:2px}
+a.card .t{font-size:19px;font-weight:800;margin-bottom:4px}
+a.card .d{font-size:14px;color:var(--ink2)}
+a.card .m{font-size:12.5px;color:var(--muted);margin-top:8px}
+h2{font-size:17px;margin:32px 0 10px;padding-top:20px;border-top:1px solid var(--hair)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--surface);
+ border:1px solid var(--hair);border-radius:10px;overflow:hidden}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--hair);vertical-align:top;overflow-wrap:anywhere}
+th{color:var(--muted);font-weight:600;font-size:12px;width:11em}
+tr:last-child td,tr:last-child th{border-bottom:0}
+.note{font-size:13px;color:var(--ink2)}
+.warn{background:#fff8e8;border:1px solid #f0dca8;border-radius:10px;padding:12px 15px;font-size:14px;margin:14px 0}
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--hair);font-size:12px;color:var(--muted);line-height:1.7}
+footer a,td a{color:var(--shade)}
+.old{font-size:13px;color:var(--muted);margin-top:10px}
+.old a{color:var(--ink2)}
+.old>summary{cursor:pointer;padding:6px 0}
+.old p{margin:6px 0}
+.flow{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:12px 0}
+.flow img{display:block;width:1400px;max-width:none;height:auto;
+ border:1px solid var(--hair);border-radius:10px;background:#fff}
+/* スマホでは原寸（1400px）だと縦1000pxが画面を占めるので、幅に合わせて縮める。
+   読むときは図をタップして SVG を開いてもらう */
+@media (max-width:700px){.flow img{width:100%}}
+</style></head>
+<body><div class="wrap">
+
+<div class="lg"><i class="mark"></i><h1>こ<em>か</em>げ</h1></div>
+<p class="tag">今ないデータ ── 作ってみたら、これだけ足りませんでした</p>
+
+<div class="lead">
+<p><b>これが、この作品のいちばん出したい成果です。</b>「アプリを作りました」ではなく、<b>実際に子連れの外出を1つ計算しきろうとして、どこで詰まったか</b>を並べています。</p>
+<p><b>すべて、こかげを作る過程で手を動かして確かめたものだけです。</b>件数はその場で数え、ライセンスは原典で確認し、公園は現地で3回見てきました。<b>調べた結果あることが分かって取り下げた指摘も、最後に4件そのまま載せています。</b></p>
+<p class="note">確認日は各行に書いてあります。件数（とくにカタログのデータセット数）は日々動きます。</p>
+</div>
+
+<p><a href="./">← こかげのトップに戻る</a></p>
+
+<h2>A. 答えの精度を直接動かしているのに、無いもの</h2>
+<p class="note">こかげが出す数値の大半は「公園にいる60分」で決まります。<b>その滞在の日陰を、いまのデータでは説明できません。</b></p>
+<table>
+<tr><th>公園の中と周りの樹木</th><td><b>正午の公園の日陰は、ほぼ全部が樹木でした。</b>（2026-08-13 現地）山吹の里公園の日陰は<b>樹木で約3割</b>、こかげが出した 2.4% は<b>園内のトイレの影だけ</b>です。<b>入れる手段が存在しません</b>：PLATEAU の <code>udx/veg</code> は2メッシュ分のみで対象の公園は範囲外、街路樹データは<b>都道のみ</b>、東京都「緑のオープンデータ」14レイヤも<b>樹林地は公園の開園区域を明示的に対象外</b>。影響は滞在の水分量で <b>−11.4%</b>（736→652mL）</td></tr>
+<tr><th>公園の中の「遊べないゾーン」</th><td><b>日陰が、植え込みの上に落ちていました。</b>（2026-08-13 現地）高田一丁目児童遊園の日陰率 13.4% は<b>面積としては正しく、意味としては外れ</b>です。公園のポリゴンは植え込み・花壇・トイレを含んだ外周で、<b>「遊べる地面」の区分がありません</b>。影響は <b>+5.7%</b>（703→743mL）で、上の樹木と<b>逆向き</b>なので打ち消し合いません</td></tr>
+<tr><th>建物の上階のセットバック</th><td><b>朝の建物の影が 11〜31ポイント過大に出ます。</b>（2026-08-14 現地／2026-08-31 再計算）原因は、4階部分が上にいくほどすぼむ形（斜線制限）を <b>PLATEAU の LOD1（底面×高さの箱）が表現できない</b>ことです。<b>都市計画側にも勾配がありません</b>：<code>udx/urf</code> の高度地区は対象地区に15面ありますが、属性は「高度地区」という種別コードだけで、<b>斜線の勾配も最高高さも入っていません</b>。<b>LOD2 があれば直りますが、この地区は建物3,437棟中0件</b>（同じ区内でも、影の精度の根拠が場所によって違います）</td></tr>
+</table>
+
+<h2>B. 列はあるのに入っていない／繋がっていない</h2>
+<table>
+<tr><th>施設のバリアフリー情報</th><td>豊島区の公共施設一覧<b>558件に列はあるが、1件も入っていない</b>。説明欄・備考欄も<b>558件すべて空欄</b></td></tr>
+<tr><th>エレベーターの有無</th><td>歩行空間ネットワーク<b>2,196リンクで「あり」が0本</b>。ベビーカーで経路探索すると<b>街が東西に割れます</b>（966ノード／858ノード）</td></tr>
+<tr><th>屋内施設の開館時間</th><td>区の558件中<b>28件（5%）</b>のみ。しかも<b>その28件は保育園24・幼稚園3・その他1</b>で、こかげが薦める区民ひろば53件・子どもスキップ22件・図書館7件には<b>1件しか入っていません</b>。都の「赤ちゃん・ふらっと一覧」が部分的に埋めますが、<b>屋内候補66件のうち37件（56%）は不明のまま</b>です（画面には「不明」と書き、調べ先を出しています）</td></tr>
+<tr><th>更新が止まっている</th><td>東京都の赤ちゃん・ふらっと一覧（2026年6月）が、<b>103m移転した「区民ひろば椎名町」の旧住所のまま</b>。豊島区の一覧（2023年）は移転前後を別レコードで持っています</td></tr>
+<tr><th>同じ公園の座標が、都と区で違う</th><td>両方に座標がある<b>55公園でズレ中央値7m・20m超が11件・50m超が5件・最大164m</b>（西池袋公園）。<b>公園データだけでは、どちらが正しいか決められません</b></td></tr>
+<tr><th>公園のベンチ・水飲み</th><td>PLATEAU の都市設備 <b>4,690件を全数えて、ベンチ0件・水飲み0件</b>。<b>なのに現地で見た2公園は、2つともベンチも水飲みもありました</b>（山吹の里：ベンチ4・丸椅子3・水飲み1／高田一丁目：ベンチ1・水飲み1）。<b>途中で補給できるかは、給水の目安を出すうえで判断の中核です</b></td></tr>
+<tr><th>公園のトイレ・東屋</th><td>高田一丁目児童遊園は<b>ポリゴン内に建築物0件なのにトイレが実在</b>。山吹の里の茅葺き状の屋根は約9㎡。<b>屋根つき休憩所が、日陰源として1件も計上されていません</b></td></tr>
+<tr><th>ガードレール</th><td>歩行空間ネットワークの16属性に無い。<b>PLATEAU には3,003件あります。繋がっていないだけです</b></td></tr>
+<tr><th>公園の遊具</th><td>東京都のオープンデータカタログ<b>9,656件のデータセットの中に、タイトルに「遊具」を含むものは1件もありません</b>（2026-08-17 に API で取得）。全文検索では3件ヒットしますが、<b>いずれも遊具そのもののデータではありません</b></td></tr>
+<tr><th>屋内施設の空調</th><td>どのオープンデータにもありません</td></tr>
+<tr><th>歩道そのもの（網羅性）</th><td>歩行空間ネットワークの仕様書に「<b>優先的に整備できる／段階的に進められる</b>」と明記。現地でも「実際にあるが地図にない道」を複数確認しました</td></tr>
+<tr><th>街に給水できる場所が無い</th><td><b>東京都水道局の給水スポット836件のうち、この範囲にあるのは2か所だけ</b>（東京芸術劇場・豊島区役所本庁舎）。しかも<b>どちらも屋内</b>で、区役所は平日と日曜の 8:30〜17:15 のみ。<b>画面は「15分ごとに給水してください」と言いますが、それを支える場所が街にありません</b></td></tr>
+<tr><th>歩行空間ネットワークの範囲と更新</th><td>整備されているのは<b>東京都内で17地区だけ</b>。しかも<b>更新日が分かる12地区のうち11地区は2018〜2021年で止まっており</b>、こかげが対応している池袋駅周辺の最終更新は<b>2019年1月</b>です</td></tr>
+</table>
+
+<h2>C. 作られているのに、機械可読で出ていない</h2>
+<p class="note">「無い」のではなく「<b>調査も測定もされているのに、使える形になっていない</b>」型です。</p>
+<table>
+<tr><th>豊島区の緑被現況調査</th><td>区は<b>令和6年度に緑被現況調査を実施し、緑被分布図まで作っています</b>（区全体の緑被率 12.74%）。<b>GIS・CSV での公開は区のページに記載がありません</b>。A の1件目（公園の樹木）は、これが出れば大きく前進します</td></tr>
+<tr><th>紫外線（UVインデックス）</th><td>気象庁の一般公開は<b>分布図の画像のみ</b>。<b>数値そのものは存在します</b>——気象業務支援センターが GRIB2・緯度0.2度×経度0.25度・毎時で配信しています（情報提供負担金の対象）</td></tr>
+<tr><th>東京消防庁の日常生活事故</th><td><b>令和2〜4年は CSV 189本・CC BY 4.0</b> で出ています（「乳幼児のベランダ・窓からの墜落事故」「遊具での事故」などのリソースつき）。<b>令和5・6年は本体がPDFのみで、CSV化が2年止まっています</b>。一度オープンデータ化された系列が止まる、という別の型の欠落です</td></tr>
+<tr><th>遊具・地面の表面温度</th><td><b>判断基準だけが公表され、面のデータがありません。</b>東京都生活文化局は熱画像測定で「<b>滑り台70℃以上／地面70℃以上</b>」（気温31.0℃・湿度45%）、「65℃以上の石材料や55℃以上の金属に10秒以上触れるとやけど」と公表しています。<b>一方、どの公園のどの遊具が何℃かは、公的にも民間にも一切ありません</b></td></tr>
+</table>
+
+<h2>D. こかげ自身が、出せなかったもの</h2>
+<p class="note">上の3つと違い、これは<b>こかげの出力の質が、直接そこで頭打ちになった</b>ものです。</p>
+<table>
+<tr><th>時別の日照時間</th><td>くもりの日は日陰の差がほぼ消えるのに、<b>こかげはくもり係数を 1.0（晴天）で固定したまま</b>です。気象庁の練馬に日照時間の列はありますが<b>日ごとの値</b>で、時別値は<b>推計（衛星＋周辺観測）しかありません</b>（練馬に日照計が無いため）。<b>＝ 提出物で「アメダスの観測値」とは書けません</b></td></tr>
+<tr><th>1時間刻みの暑さ指数の予測</th><td>環境省の予測は<b>3時間間隔</b>です。こかげが出す6時刻のうち<b>11・13・14・16時は内挿</b>しています。また、APIが取れないときのフォールバック（2025年8月・3地点・31日から自作した時刻差 −0.22〜−1.38℃・ばらつき ±1.0〜1.5℃）には<b>公式の裏づけがありません</b></td></tr>
+</table>
+
+<h2>E. 調べた結果、取り下げた指摘</h2>
+<p class="note">言いたくなったけれど、確かめたら<b>データの側が正しかった</b>ものです。この4件も同じ重さで載せます。</p>
+<table>
+<tr><th>「渡れない横断歩道がある」</th><td><b>取り下げ。</b>（2026-08-12 現地）「反対側の歩道に渡れない」と地図が言う13か所を全部歩いたところ、<b>13か所とも本当に横断歩道がありませんでした</b>。データが現実と合っていました</td></tr>
+<tr><th>「公園の形のデータが無い」</th><td><b>取り下げ。</b>（2026-08-17 実見）東京都都市整備局「緑のオープンデータ（GISデータ）」が 2026年1月に公開されており、<b>公園名・所在地・面積・種別つきのポリゴン</b>で入っていました（豊島区92件・池袋周辺51件ほか）。<b>こかげは 2026-08-31 に、公園の形をこのデータへ置き換えました</b></td></tr>
+<tr><th>「そのライセンスが不明」</th><td><b>取り下げ。</b>（2026-08-31 原典確認）データセット全体のライセンス欄は「その他」ですが、<b>リソースの説明に「【ライセンス：クリエイティブ・コモンズ 表示(CCBY)】」と明記</b>されています（18リソース中17件）。<b>使ってよいかは分かります。</b>残せるのは「データセット単位の欄だけを見ると分からない」という粒度の話までです</td></tr>
+<tr><th>「歩道の交通量が無い」</th><td><b>言わないことにしました。</b>探し切っていないためです。なお<b>車道の交通量はあります</b>（警視庁「交通量統計表」CC BY／国土交通省 道路交通センサス）。無いと言えるとしても<b>歩道の歩行者・自転車</b>に限られ、それも未確認です</td></tr>
+</table>
+
+<div class="warn">
+<b>この一覧は、批判のために作ったものではありません。</b>どれも「あれば、この計算がそのまま良くなる」ものとして、実際に詰まった場所から書き出しています。<b>いちばん効くのは A の3件</b>で、なかでも<b>公園の中の樹木</b>です。
+</div>
+
+<footer>
+こかげ ／ 都知事杯オープンデータ・ハッカソン2026 応募作品（開発中）<br>
+各行の件数・比率は、こかげの開発中（2026年8月）に実際に数えた値です。カタログのデータセット数など、時間とともに動く数字が含まれます。<br>
+<a href="./">こかげのトップへ</a>
+</footer>
+</div></body></html>

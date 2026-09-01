@@ -165,6 +165,9 @@ details{background:var(--surface);border:1px solid var(--hair);border-radius:12p
 summary{cursor:pointer;font-size:13px}
 table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
 th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertical-align:top}
+/* ★ 2026-08-31：430px だと左列（項目名）が「精／度」と1文字ずつ折り返していた。
+   折り返さず、内容ぶんだけの幅にする（width:1% ＝ 中身に合わせて縮める指定） */
+tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
 .boot{background:#fff8e6;border:1px solid var(--warning);border-radius:12px;padding:12px 14px;font-size:13px;margin:14px 0}
 </style>
 </head>
@@ -301,7 +304,7 @@ th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertic
   <p class="lead" id="lead3">往復と滞在で失われる水分量が少ないと推測される順に、3つご提案します。お子様が日陰で遊んでくれそうか、どこが影になるかを見てみてください。</p>
   <div class="cards" id="cards"></div>
   <p class="note cred">地図：次の3点を丸山倫太朗が加工して作成しました。3D都市モデル（Project PLATEAU）豊島区（2025年度）／東京都／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／歩行空間ネットワークデータ（池袋駅周辺）／国土交通省／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／公園・緑地等（緑のオープンデータ GISデータ）／東京都都市整備局／<a href="https://catalog.data.metro.tokyo.lg.jp/dataset/t000008d2000000024" target="_blank" rel="noopener">クリエイティブ・コモンズ 表示（CC BY）</a>。東京都・国土交通省が作成したものではありません。</p>
-  <p class="note" id="n3">★ 図の青は建物と高架の影です。樹木の影は入っていません。公園の日陰は実際には樹木が作っていることが多く、現地で確かめたところ、この図は日陰を 9〜32ポイント少なく見ています。割合の数字は出していません。形だけを見てください。</p>
+  <p class="note" id="n3">★ 図の青は建物と高架の影です。樹木の影は入っていません。現地で確かめると、朝は建物の影を実際より 11〜31ポイント大きく、正午は樹木の分（約3割）を丸ごと取りこぼしていました。ずれが両方向に出るので、割合の数字は出していません。形だけを見てください。</p>
 </section>
 
 <section class="step" id="step3"><span class="no">3／どの道で行くか</span>
@@ -334,7 +337,7 @@ th,td{text-align:left;padding:5px 4px;border-bottom:1px solid var(--hair);vertic
 <tr><td>歩行速度</td><td>53.1 m/分（3歳児を連れて本人が実測。同一の親子1組で3区間・170m/650m/600m・51.6〜54.5 m/分を距離で加重）</td></tr>
 <tr><td>遊び方</td><td id="metsCell">走り回る中心（走る75%・実効METs 4.90）</td></tr>
 <tr><td>暑さ指数</td><td><b>既定は今日の値です。</b>環境省（練馬と東京の高い方）の、過ぎた時刻は実況、これからの時刻は予測（3時間刻みなので11/13/14/16時は内挿）。<b>取れないときは去年8月の平均時刻差（−0.22〜−1.38℃・ばらつき±1.0〜1.5℃）に戻り、その旨を画面に出します。</b>スライダーで手動の上書きもできます</td></tr>
-<tr><td>精度</td><td>L1＝歩行空間ネットワーク上／L3＝最後の数百mが直線距離からの概算</td></tr>
+<tr><td>精度</td><td><b>L1</b>＝行き先まですべて歩行空間ネットワーク上（公園の縁にノードがある）／<b>L2</b>＝ネットワークの端から公園の縁まで<b>60m以内</b>で、そこだけ直線距離×1.3（迂回係数）を足しています／<b>L3</b>＝同じ直線近似ですが60mを超える場合。<b>400mを超える行き先は出しません。</b>★ この記号は内部の判定用で、画面には出していません</td></tr>
 <tr><td>日付</td><td>太陽の位置は 2026年8月12日で固定しています。晴天時の値です</td></tr>
 <tr><td>計算する場所</td><td>経路探索はこの端末の中で走ります。入力した位置はどこにも送っていません</td></tr>
 </table>
