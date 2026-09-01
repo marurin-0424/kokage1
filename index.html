@@ -34,7 +34,7 @@ a.card.main{border-color:var(--park);border-width:2px}
 a.card .t{font-size:19px;font-weight:800;margin-bottom:4px}
 a.card .d{font-size:14px;color:var(--ink2)}
 a.card .m{font-size:12.5px;color:var(--muted);margin-top:8px}
-h2{font-size:17px;margin:32px 0 10px;padding-top:20px;border-top:1px solid var(--hair)}
+h2{font-size:17px;margin:32px 0 10px;padding-top:20px;border-top:1px solid var(--hair);scroll-margin-top:12px}
 table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--surface);
  border:1px solid var(--hair);border-radius:10px;overflow:hidden}
 th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--hair);vertical-align:top;overflow-wrap:anywhere}
@@ -102,19 +102,19 @@ footer a,td a{color:var(--shade)}
 お子様の様子を見て、のどの渇きに応じて自由に飲めるようにしてください（環境省）。
 </div>
 
-<h2>いま答えられる範囲</h2>
+<h2 id="scope">いま答えられる範囲</h2>
 <table>
 <tr><th>範囲</th><td><b>池袋駅周辺 約2.5km × 1.1km</b>（歩行空間ネットワークの収録範囲）</td></tr>
 <tr><th>できること</th><td>建物と高架の影／どちら側の歩道か／段差・幅員・階段／横断歩道と信号待ち／暑さ指数31以上の時刻には屋外の行き先を出さない／屋内施設は分かる範囲で開館時間を出す／道の途中の給水スポット</td></tr>
 <tr><th>できないこと</th><td>収録範囲の外では答えを出せません。<b>地下鉄の雑司が谷駅からは、歩いて3分の雑司が谷公園にも答えられません。</b>歩行空間ネットワークが整備されているのは都内17地区だけだからです。<b>樹木の影は入っていません</b>（建物と高架のみ）。曇りの補正も入っていません</td></tr>
 </table>
 
-<h2>入力から mL が出るまで（1枚図）</h2>
+<h2 id="flow">入力から mL が出るまで（1枚図）</h2>
 <p class="note">どのデータが、どの計算に効いているのかを1枚にしました。<b>2026-08-12 13:00・池袋駅東口発の「577mL」</b>という実際の出力で描いています。<b>灰色は、取得はしたけれど答えには使っていないデータ</b>です。</p>
 <div class="flow"><a href="./dataflow.svg" target="_blank" rel="noopener"><img src="./dataflow.svg" width="1400" height="1000" alt="こかげのデータフロー図。入力6つ、データ15種、計算6ステップ、出力577mL"></a></div>
 <p class="note"><b>図をタップすると原寸（SVG）で開きます。</b>スマホでは縮小して表示しています。作っているのは <code>src/viz_flow.py</code> です。</p>
 
-<h2>現地で3回、答え合わせをしました</h2>
+<h2 id="field">現地で3回、答え合わせをしました</h2>
 <p class="note">公開データから出した答えを、そのまま現地で確かめられる——それがこの作り方を選んだ理由です。<b>当たっていたことと、外れていたことの両方</b>を出します。</p>
 <table>
 <tr><th>① 8月12日<br>横断歩道13か所</th><td><b>データが正しく、こちらの想定が外れました。</b>「反対側の歩道に渡れない」と地図が言う13か所を全部歩いたところ、<b>13か所とも本当に横断歩道がありませんでした</b>。<b>→ 「今ないデータ」の主張を1件取り下げました。</b></td></tr>
@@ -123,7 +123,7 @@ footer a,td a{color:var(--shade)}
 </table>
 <p class="note"><b>道路の影（＝どちら側の歩道を歩くか）は、3回とも現地と概ね一致しました。</b>移動については建物の影だけで出せそうです。一方、<b>滞在（公園）の日陰は建物の影ではほとんど説明できません</b>。答えの大半を決めているのは滞在なので、<b>いちばん不確かなところが、いちばん効いています</b>。</p>
 
-<h2>使っているオープンデータ</h2>
+<h2 id="data">使っているオープンデータ</h2>
 <p class="note">いずれも<b>丸山倫太朗が加工して利用</b>しています（影の計算・座標の突合・時刻差の算出）。</p>
 <table>
 <tr><th>建物・橋梁・地盤高</th><td>3D都市モデル（Project PLATEAU）豊島区（2025年度）／ <b>東京都</b> ／ CC BY 4.0 <a href="https://creativecommons.org/licenses/by/4.0/deed.ja">https://creativecommons.org/licenses/by/4.0/deed.ja</a></td></tr>
@@ -137,7 +137,7 @@ footer a,td a{color:var(--shade)}
 <p class="note"><b>これは東京都・国土交通省・豊島区・環境省が作成したものではありません。</b></p>
 <p class="note">このほか、<b>検証にのみ</b>次の3件を使いました（答えには反映していません）：都道の街路樹（東京都建設局）は街路樹の影を実装して影響量を評価しましたが、都道のみで区道が入らないため／アメダス観測データ（気象庁）は日照時間から曇りの係数を作れるか調べましたが、時別値が取れないため／都営バス GTFS-JP（東京都交通局）は停留所名を公園の位置説明に使いました。</p>
 
-<h2>作っていて分かったこと</h2>
+<h2 id="found">作っていて分かったこと</h2>
 <p class="note">この作品のいちばん出したい成果です。ここには5件だけ抜き出しています。<b><a href="./missing-data.html">全22件＋調べて取り下げた指摘4件は、こちらにまとめました →</a></b></p>
 <table>
 <tr><th>今ないデータ</th><td>公園の遊具は、東京都のオープンデータカタログ<b>9,656件のデータセットの中に1件もありません</b>（2026-08-17 に CKAN API で取得した件数。タイトルに「遊具」を含むデータセットが0件という意味で、全文検索では3件ヒットしますが、いずれも遊具そのもののデータではありません。カタログの件数は日々動きます）。施設のバリアフリー情報は豊島区558件に列はあるが<b>1件も入っていない</b>。歩行者ネットワーク2,196リンクで<b>エレベーターありは0本</b></td></tr>
