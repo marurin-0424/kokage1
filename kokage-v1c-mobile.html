@@ -229,7 +229,6 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
   <div id="outside" class="crit hidden"></div>
   <div class="pickwrap" id="pickWrap" style="margin-top:0">
     <canvas id="pickMap" width="720" height="480"></canvas>
-    <p class="note cred">地図：次の4点を丸山倫太朗が加工して作成しました。3D都市モデル（Project PLATEAU）豊島区（2025年度）／東京都／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／歩行空間ネットワークデータ（池袋駅周辺）／国土交通省／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／公共施設一覧／豊島区／<a href="https://creativecommons.org/licenses/by/2.1/jp/" target="_blank" rel="noopener">CC BY 2.1 日本</a>／赤ちゃん・ふらっと一覧／東京都福祉局／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>。東京都・国土交通省・豊島区が作成したものではありません。</p>
   </div>
   <div class="r" style="margin-top:8px">
     <button id="geo">現在地</button>
@@ -284,6 +283,10 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
   <!-- ★ 2026-09-02：条件を決め終わったら①へ送る。計算は条件を変えた時点で走っているので、
        このボタンは移動だけを担う。 -->
   <button id="searchBtn" class="wide">検索</button>
+
+  <!-- ★ 2026-09-02：地図の直下だと設問の間に割り込んで読みにくいので、カードの末尾に移した。
+       折りたたみには入れない（事務局指摘 2026-08-25 の再発防止）。同じカードの中に常時表示で残す。 -->
+  <p class="note cred" style="margin-top:14px">地図：次の4点を丸山倫太朗が加工して作成しました。3D都市モデル（Project PLATEAU）豊島区（2025年度）／東京都／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／歩行空間ネットワークデータ（池袋駅周辺）／国土交通省／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／公共施設一覧／豊島区／<a href="https://creativecommons.org/licenses/by/2.1/jp/" target="_blank" rel="noopener">CC BY 2.1 日本</a>／赤ちゃん・ふらっと一覧／東京都福祉局／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>。東京都・国土交通省・豊島区が作成したものではありません。</p>
 
 </div>
 
@@ -653,8 +656,6 @@ async function load(){
   ent.forEach(([k],i)=>{D_[k]=got[i];});
   D_.points=D_.labels.points||[]; D_.labels=D_.labels.labels||[];
 }
-/* 既定の時刻の影だけ、起動と同時に取りにいく（②の行き先を出すのに要る） */
-function prefetchShadow(h){ if(!D_.shadow[h]) shadowFor(h).catch(()=>{}); }
 /* 建物は最初の描画が終わってから取りにいく（帯域を影と取り合わせない） */
 function loadFoot(){ if(footReady) return footReady;
   footReady=fetch('map_foot.json').then(r=>r.ok?r.json():[]).then(j=>{D_.foot=j;})
@@ -1315,6 +1316,8 @@ function gmapUrl(segs,t){
 
 /* ===================== まとめて描き直す ===================== */
 let busy=false, keepWarn=false;
+/* ★ 2026-09-02：最初の描画のときだけ、時刻をおすすめの時刻に合わせる */
+let autoHour=true;
 async function render(){
   if(state.x===null||busy) return;
   busy=true;
@@ -1359,6 +1362,16 @@ async function render(){
     if(!keepWarn) $('#outside').classList.add('hidden');
     state.prev={x:state.x,y:state.y,label:$('#originLabel').textContent};
     const st=hourStats();
+    /* ★ 2026-09-02：開いた瞬間の時刻を「おすすめの時刻」に合わせる。
+       以前は 13時固定で、①の見出しが「16時の出発がおすすめです。」と言いながら
+       選ばれているのは13時、という食い違いのまま開いていた。
+       13時だったのは暑さ指数のスライダーが13時の値を動かすという計算側の都合で、
+       利用者から見た理由が無い。最初の1回だけ動かす（そのあとは利用者の選択が勝つ）。 */
+    if(autoHour){
+      autoHour=false;
+      const pr=pickRecommended(st);
+      if(pr.rec!==null && pr.rec!==state.hour){ state.hour=pr.rec; state.pickIdx=0; }
+    }
     drawTimeline(st);
     renderHours(st);
     const res=st[state.hour].res;
@@ -1764,8 +1777,10 @@ $('#fc').onclick=()=>useForecast(false);
 /* ===================== 起動 ===================== */
 (async()=>{
   try{
-    /* 影は load() を待たずに走らせる（②の行き先を出すのに要る、いちばん重いファイル） */
-    prefetchShadow(state.hour);
+    /* ★ 2026-09-02：影の先読みをやめた。
+       以前は load() と並行して13時の影（1.11MB）を取っていたが、
+       既定の時刻が「おすすめの時刻」に変わったので、13時の影はほとんどの日で捨てられる。
+       先読みで稼げるのは load() と重なる数百ミリ秒だけで、無駄になる1.11MBの方が重い。 */
     await load();
     K=new Kokage(D_.bundle);
     AF=fitAffine(D_.bundle.nodes);
