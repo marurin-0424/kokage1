@@ -44,8 +44,10 @@ ok('A-6 権利表記が折りたたみの中に無い', a.credsInDetails === 0, 
 ok('A-7 利用データの一覧が既定で開いている', a.license === true);
 
 /* B) 時刻をタップ → ② の先頭で止まる（C53：render() は async） */
-const rows = await p.$$('#step1 button');
-if (rows[6]) { await rows[6].click(); await p.waitForTimeout(2500); }
+/* ★ 2026-09-02：#step1 にチップのボタンが増えたので、時刻の行だけを選ぶ。
+   以前の `#step1 button` の6番目は、チップが入ったことで 16時ではなく 15時になっていた。 */
+const rows = await p.$$('#hours .hr');
+if (rows[5]) { await rows[5].click(); await p.waitForTimeout(2500); }
 const bTop = await p.evaluate(() => Math.round(document.getElementById('step2').getBoundingClientRect().top));
 ok('B-1 時刻タップで②の先頭に止まる（飛び越えない）', Math.abs(bTop) < 60, 'step2Top=' + bTop);
 
@@ -105,10 +107,11 @@ if (inSel) {
   /* D-6：ボタンを押すと出発地の地図が開き、範囲の全体が入る倍率に引かれる */
   await p2.click('#outsidePick');
   await p2.waitForTimeout(2500);
+  /* ★ 2026-09-02：地図は常時表示になったので「開くか」ではなく「見えているか」を見る。 */
   const g = await p2.evaluate(() => ({
-    open: !document.querySelector('#pickWrap').classList.contains('hidden'),
+    open: document.querySelector('#pickWrap')?.offsetParent !== null,
     px: document.querySelector('#pickMap')?.width }));
-  ok('D-6 「地図で範囲を見る」で出発地の地図が開く', g.open);
+  ok('D-6 「地図で範囲を見る」のあと出発地の地図が見えている', g.open);
   /* D-7：範囲の輪郭（破線）が実際に描かれているか。
      線は canvas の絵なので DOM では見えない。赤い画素を数えて確かめる。 */
   const red = await p2.evaluate(() => {

@@ -42,13 +42,21 @@ h2{font-size:17px;margin:0 0 4px}
 .orig{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:12px 14px;margin:10px 0 0}
 .orig .r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .orig .lb{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em}
-.orig .who{font-size:13px;color:var(--ink2);flex:1;min-width:100%}
+.orig .who{font-size:13px;color:var(--ink2)}
 button{font:inherit;padding:7px 12px;border:1.5px solid var(--hair);background:#fff;border-radius:9px;cursor:pointer;color:var(--ink)}
 button.on{background:var(--park);color:#fff;border-color:var(--park)}
 button:disabled{opacity:.5}
 canvas{width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--hair);background:#fff;touch-action:manipulation}
 .pickwrap{margin-top:10px}
 .hidden{display:none}
+/* ★ 2026-09-02：条件設定を読ませる。見出しを 11px 灰 → 14px 黒にし、設問の間隔を 0 → 18px。
+   体重の入力欄はチップのボタンと高さ・字の大きさを揃える（font:inherit ＝ 16px。
+   16px を下回ると iOS が入力時に画面を拡大する）。 */
+.fld{margin-top:18px}
+.fld .lb{display:block;font-size:14px;color:var(--ink);letter-spacing:0;margin-bottom:7px}
+#bw{font:inherit;padding:7px 12px;border:1.5px solid var(--hair);border-radius:9px;
+background:#fff;width:92px;text-align:center}
+#searchBtn{margin-top:20px}
 
 /* ① ゲート
    ★ 2026-08-22：見出しを「今日、行けるか」から「今日、行ける時刻はあるか」に変えた。
@@ -79,39 +87,53 @@ input[type=range]{flex:1;min-width:120px}
      「31以上・行き先を出しません」が出た時刻だけバーが半分になって、
      日陰率を時刻どうしで比べられなくなっていた。 */
 .hours{display:grid;grid-template-columns:1fr;gap:6px}
-.hr{display:grid;grid-template-columns:42px 1fr 124px 13px;align-items:center;gap:10px;
-border:1.5px solid var(--hair);background:var(--surface);border-radius:11px;padding:9px 11px;
-text-align:left;cursor:pointer;font:inherit;transition:.12s;width:100%}
+/* ★ 2026-09-02：カードの中の小さい字（発汗量目安／暑さ指数◯◯／屋外の目安は出しません）を
+   すべて外し、6行の上に見出し行を1本置いた。暑さ指数は左端5pxの色帯をやめ、
+   時刻の右の色付きピルにしてある。6行で縦に並ぶので、数字の高低がそのまま比べられる。
+   列は 時刻40 / ピル46 / バー1fr / 発汗量88 / ›24。 */
+.hhead,.hr{display:grid;grid-template-columns:40px 46px 1fr 88px 24px;gap:7px;align-items:center}
+.hhead{padding:0 11px 5px;font-size:10px;color:var(--muted);line-height:1.3;text-align:center}
+.hhead span:nth-child(4){text-align:right}
+.hr{border:1.5px solid var(--hair);background:var(--surface);border-radius:11px;padding:9px 11px;
+text-align:left;cursor:pointer;font:inherit;width:100%;
+box-shadow:0 1px 2px rgba(0,0,0,.05);transition:transform .1s,background .1s,border-color .12s}
+/* ★ 2026-09-02：押した瞬間の手応え。以前は押しても見た目が変わらず、
+   「押せる」より「反応しない」と読まれる形だった。 */
+.hr:active{transform:scale(.98);background:#f0efeb}
 .hr[aria-pressed=true]{border-color:var(--park);background:#f2fbf7}
 .hr.dim{background:var(--plane);border-color:#e7e6e0;opacity:.72}
 .hr.dim[aria-pressed=true]{border-color:var(--park);opacity:1}
 .hr .t{font-size:16px;font-weight:700}
-.hr .s{font-size:11px;color:var(--ink2);line-height:1.5;text-align:right;font-variant-numeric:tabular-nums}
-.hr .s b{color:var(--ink)}
-/* ★ 2026-08-23：何を基準に選ぶかを見えるようにするため、発汗量目安を主役にした。
-   日陰率の数字は消してバーだけにする（バーが日陰率そのものなので二重になっていた）。 */
-.hr .s .ml{display:block;font-size:19px;font-weight:700;color:var(--ink);line-height:1.15}
-.hr .s .ml i{font-size:12px;font-weight:700;font-style:normal;margin-left:1px}
-.hr .s .sub{display:block;font-size:10.5px;color:var(--muted);line-height:1.5}
-
-.hr .ch{font-size:19px;color:var(--muted);text-align:right;line-height:1}
-.hr[aria-pressed=true] .ch{color:var(--park)}
+.hr .pill{display:block;font-size:13px;font-weight:700;color:#fff;border-radius:999px;
+padding:2px 0;text-align:center;font-variant-numeric:tabular-nums}
+.hr .pill.g{background:#5aa886}.hr .pill.y{background:#d9a616}.hr .pill.r{background:var(--critical)}
 .hr .mid{display:block;min-width:0}
+.hr .bd{display:block;text-align:center;margin-bottom:3px;line-height:1.4;min-height:16px}
+.hr .pc{font-size:11.5px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
 .hr .bar{display:block;height:11px;border-radius:4px;background:var(--sun);overflow:hidden}
 .hr .bar i{display:block;height:11px;background:var(--shade);border-radius:4px 0 0 4px}
-/* ★ バッジが無い行でも高さを空けておく。空けないと、バッジのある行だけバーが下がって
-   6本のバーが同じ高さに並ばなくなる。行の高さは右の3行（日陰・暑さ・mL）が決めているので、
-   ここを空けても行は高くならない。 */
-.bd{display:block;min-width:0;margin-bottom:3px;font-size:10px;line-height:1.4;min-height:16px}
-.badge{display:inline-block;margin:0 2px 0 0;font-size:10px;font-weight:700;color:#fff;background:var(--park);
-border-radius:999px;padding:1px 7px;line-height:1.4;white-space:nowrap}
-.badge.bad{background:var(--sun)}
-.badge.gate{background:var(--critical)}
-.badge.gray{background:#a9a7a1}
-/* ★ 2026-08-22：①②を畳んだので、暑さ指数の色は行の左端のチップで表す */
-.hr{position:relative;overflow:hidden}
-.hr .chip{position:absolute;left:0;top:0;bottom:0;width:5px}
-.badge.warn{background:#f2c94c;color:#5a4300}
+.hr .mlc{display:flex;align-items:center;justify-content:flex-end;min-height:30px;text-align:right}
+.hr .ml{font-size:19px;font-weight:700;color:var(--ink);line-height:1.15;font-variant-numeric:tabular-nums}
+.hr .ml i{font-size:12px;font-weight:700;font-style:normal;margin-left:1px}
+.hr .ng{font-size:10px;font-weight:700;color:#8a1c1c;line-height:1.4}
+.hr .ng span{display:block;white-space:nowrap}
+/* ★ 2026-09-02：右端の › を丸ボタンにした。選択中は緑の円に白い ›。 */
+.hr .ch{width:24px;height:24px;border-radius:50%;background:var(--plane);color:var(--ink2);
+border:1px solid var(--hair);display:flex;align-items:center;justify-content:center;
+font-size:15px;line-height:1}
+.hr[aria-pressed=true] .ch{background:var(--park);color:#fff;border-color:var(--park)}
+.tapnote{font-size:12px;color:var(--ink2);margin:9px 0 0;text-align:center}
+/* ★ 2026-09-02：進んだ先でも、いま何で計算しているかが見えて、そこへ戻れるようにする。
+   飛び先が同じ3つ（屋内外・遊び方・滞在）は1チップにまとめた。
+   出発地と体重は、普通は途中で変えないので入れていない。 */
+.cond{margin:0 0 10px}
+.cond .cl{display:block;font-size:10.5px;color:var(--muted);margin-bottom:5px}
+.cond .cs{display:flex;gap:6px;flex-wrap:wrap}
+.cond .c{font:inherit;font-size:11.5px;color:var(--ink2);background:#fff;border:1px solid var(--hair);
+border-radius:999px;padding:3px 10px;cursor:pointer;line-height:1.5}
+.cond .c b{color:var(--ink);font-weight:700}
+.cond .c em{font-style:normal;color:var(--muted);margin-left:5px}
+.cond .c:active{background:var(--plane);transform:scale(.97)}
 button.wide{width:100%;padding:12px;font-size:14px;font-weight:700;
 background:var(--park);color:#fff;border-color:var(--park)}
 .wsrc{font-size:12px;color:var(--ink2);background:var(--plane);border-radius:8px;
@@ -130,6 +152,15 @@ select{font:inherit;padding:5px 8px;border:1.5px solid var(--hair);border-radius
 .card{border:1.5px solid var(--hair);border-radius:12px;overflow:hidden;background:var(--surface);
 cursor:pointer;text-align:left;font:inherit;width:100%;padding:0}
 .card[aria-pressed=true]{border-color:var(--park)}
+/* ★ 2026-09-02：カードにも押した手応えと、押し先の入口を付けた（› すら無かった）。 */
+.card{box-shadow:0 1px 2px rgba(0,0,0,.05);transition:transform .1s,background .1s}
+.card:active{transform:scale(.99);background:#f7f6f3}
+.go{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:8px;
+padding-top:8px;border-top:1px dashed var(--hair);font-size:12.5px;font-weight:700;color:var(--ink2)}
+.go i{width:24px;height:24px;border-radius:50%;background:var(--plane);border:1px solid var(--hair);
+display:flex;align-items:center;justify-content:center;font-size:15px;font-style:normal}
+.card[aria-pressed=true] .go{color:var(--park)}
+.card[aria-pressed=true] .go i{background:var(--park);color:#fff;border-color:var(--park)}
 .card figure{margin:0;background:#fff;border-bottom:1px solid var(--hair)}
 .card .body{padding:10px 12px}
 .card .nm{font-size:16px;font-weight:700}
@@ -191,19 +222,19 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
 <div id="boot" class="boot hidden"></div>
 
 <div class="orig">
-  <div class="r">
-    <span class="lb">どこから出ますか</span>
-  </div>
-  <div class="r" style="margin-top:6px">
-    <button id="geo">現在地</button>
-    <button id="pickBtn">地図から選ぶ</button>
-  </div>
-  <div class="who" id="originLabel">池袋駅東口</div>
+  <!-- ★ 2026-09-02：地図を最初から出す（「地図から選ぶ」ボタンは廃止）。
+       操作の説明（タップで出発地…）は消し、「現在地」は地図の下に移した。 -->
+  <div class="fld" style="margin-top:0">
+  <span class="lb">どこから出ますか</span>
   <div id="outside" class="crit hidden"></div>
-  <div class="pickwrap hidden" id="pickWrap">
+  <div class="pickwrap" id="pickWrap" style="margin-top:0">
     <canvas id="pickMap" width="720" height="480"></canvas>
-    <p class="note">タップで出発地、ドラッグで移動、ピンチ／ホイールで拡大縮小、ダブルタップで元に戻ります。白く伏せた外側は計算できません（歩行空間ネットワークから200mまで）。灰色は建物、青灰色の線は歩ける道です。</p>
     <p class="note cred">地図：次の4点を丸山倫太朗が加工して作成しました。3D都市モデル（Project PLATEAU）豊島区（2025年度）／東京都／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／歩行空間ネットワークデータ（池袋駅周辺）／国土交通省／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／公共施設一覧／豊島区／<a href="https://creativecommons.org/licenses/by/2.1/jp/" target="_blank" rel="noopener">CC BY 2.1 日本</a>／赤ちゃん・ふらっと一覧／東京都福祉局／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>。東京都・国土交通省・豊島区が作成したものではありません。</p>
+  </div>
+  <div class="r" style="margin-top:8px">
+    <button id="geo">現在地</button>
+    <span class="who" id="originLabel">池袋駅東口</span>
+  </div>
   </div>
 
   <!-- ★ 2026-08-23：条件の順番を「どこから→どこで→どんな遊び方→どれくらい遊ぶ→体重」に並べ替え、
@@ -250,13 +281,19 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
     </div>
   </div>
 
+  <!-- ★ 2026-09-02：条件を決め終わったら①へ送る。計算は条件を変えた時点で走っているので、
+       このボタンは移動だけを担う。 -->
+  <button id="searchBtn" class="wide">検索</button>
+
 </div>
 
 <!-- ★ 2026-08-22：①と②を1つに畳んだ（4ステップ → 3ステップ）。
      同じ6時刻の暑さ指数を①の帯と②の行で2回描いていたため。
      暑さの色は各行の左端の5pxチップに移し、28以上には黄バッジを足した。
      ★ 全時刻ゲートの日は、6行を畳んで「屋内を見る」だけ出す（言い切りの強さを保つため）。 -->
-<section class="step" id="step1"><span class="no">1／いつ出かけるか</span>
+<section class="step" id="step1">
+  <div class="cond" id="cond1"></div>
+  <span class="no">1／いつ出かけるか</span>
   <h2 id="gateH">今日は出かけられます。</h2>
   <div id="gateBox"></div>
   <p class="lead" id="gateLead" style="margin:0 0 10px"></p>
@@ -269,14 +306,17 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
   </div>
 
   <div id="hoursWrap">
+    <!-- ★ 2026-09-02：見出し行を1本置き、カードの中の小さい字を外した -->
+    <div class="hhead"><span></span><span>暑さ指数</span><span>歩道の日陰割合</span><span>発汗量目安</span><span></span></div>
     <div class="hours" id="hours"></div>
+    <p class="tapnote">時刻をタップすると、その時刻の行き先が下に出ます。</p>
     <div class="lg" style="margin-top:10px">
-      <span><i style="background:#79c9a3"></i>28未満</span>
-      <span><i style="background:#f2c94c"></i>28以上（子どもは外出を避けたい）</span>
+      <span><i style="background:#5aa886"></i>28未満</span>
+      <span><i style="background:#d9a616"></i>28以上（子どもは外出を避けたい）</span>
       <span><i style="background:#d03b3b"></i>31以上（大人でも避けたい）</span>
     </div>
     <p class="worse hidden" id="worse"></p>
-    <p class="note">左端の色が、その時刻の暑さ指数です。バーは周囲400mの歩道の日陰率。</p>
+    <p class="note" id="hnote"></p>
     <!-- ★ 2026-08-23：一部の時刻だけ31以上の日の入口。
          その時刻の行は数字を出さない（屋外の目安が無いため）ので、
          「屋内なら何時か」を比べたい人をワンタップで屋内モードへ送る。
@@ -309,7 +349,9 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
   </details>
 </section>
 
-<section class="step" id="step2"><span class="no">2／どこへ行くか</span>
+<section class="step" id="step2">
+  <div class="cond" id="cond2"></div>
+  <span class="no">2／どこへ行くか</span>
   <h2 id="h3">どこに行きますか？</h2>
   <p class="lead" id="lead3">往復と滞在で失われる水分量が少ないと推測される順に、3つご提案します。お子様が日陰で遊んでくれそうか、どこが影になるかを見てみてください。</p>
   <div class="cards" id="cards"></div>
@@ -317,7 +359,9 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
   <p class="note" id="n3">★ 図の青は建物と高架の影です。樹木の影は入っていません。現地で確かめると、朝は建物の影を実際より 11〜31ポイント大きく、正午は樹木の分（約3割）を丸ごと取りこぼしていました。ずれが両方向に出るので、割合の数字は出していません。形だけを見てください。</p>
 </section>
 
-<section class="step" id="step3"><span class="no">3／どの道で行くか</span>
+<section class="step" id="step3">
+  <div class="cond" id="cond3"></div>
+  <span class="no">3／どの道で行くか</span>
   <h2>日なたが少ないルート</h2>
   <p class="lead">選んだ行き先まで、日なたのいちばん短い道です。道路のどちら側の歩道を歩くかまで出しています。</p>
   <canvas id="map" width="720" height="540"></canvas>
@@ -520,7 +564,10 @@ class Kokage{
        屋内モードで 11時=341 / 12時=258 と不連続に落ちるのはこれが原因で、
        時刻の差ではないものを時刻の差として見せ、推奨時刻まで誤らせていた。
        ★ 既定（暑さ指数29.0）は1時刻もゲートしないので、6つの数値は変わらない。 */
-    const gate=wbgt>=C.GATE_WBGT,mets=metsPlay;
+    /* ★ 2026-09-02：表示は小数第1位なので、判定も丸めてから比べる。
+       丸める前は 30.999… が「31未満」で通り、画面に「31.0」と出ているのに
+       ゲートに入らない行ができていた（暑さ指数を数字で出したことで見えた）。 */
+    const gate=Math.round(wbgt*10)/10>=C.GATE_WBGT,mets=metsPlay;
     const D=this.dijkstra(o.node,hi,wbgt,bw,sunFrac);
     const rows=[], seenName=new Set();
     for(const p of this.b.parks){
@@ -971,44 +1018,27 @@ function renderHours(st){
     const b=document.createElement('button');
     b.className='hr';b.dataset.h=h;b.setAttribute('aria-pressed',String(h===state.hour));
     const sh=st[h].shade;
-    let badge='';
-    /* ★ 2026-08-22：31以上の時刻は①で名指ししたので、②では灰色に沈めて「屋内のみ」と短く言う。
-       クリックは殺さない（涼める屋内への導線が消えてしまうため）。 */
-    if(st[h].gate){
-      /* ★ 屋内を選んでいるなら沈めない。外が31以上という情報だけ出す。 */
-      badge = state.place==='in'
-        ? '<span class="badge gray">外は31以上</span>'
-        : '<span class="badge gray">31以上・屋内のみ</span>';
-      if(state.place!=='in') b.classList.add('dim');
-    }
-    /* ★ 31未満の時刻にバッジは出さない。ここには3つあったが、すべて外した。
-       ・28以上（2026-08-22）……池袋の8月は6時刻ともほぼ28以上で、毎行出ると意味が薄れる。
-                                左端のチップの色と凡例で表す。
-       ・「◯時より悪い」の橙（2026-08-23）……#worse の一文に移した。
-       ・「待つ価値あり」の緑（2026-08-23）……①の見出しと重複するため。
-       ★★ 注意：`pitch.md` §5-B は 橙バッジを「案Bの本体」と書いており、
-          デッキ P06 と `slides.md` の台本も「悪くなる時刻を出します」と言っている。
-          この3箇所の言い方を直す必要がある（未対応）。 */
-    /* ★ 2026-08-22：バッジは列ではなくバーの上に積む。
-       列に置くと文字数ぶんバーが縮み、日陰率を時刻どうしで比べられなくなっていた。 */
-    /* ★ 2026-08-22：行の左端に暑さ指数の色。緑=28未満／黄=28以上／赤=31以上 */
-    const lv = st[h].gate ? '#d03b3b' : (st[h].wbgt>=28 ? '#f2c94c' : '#79c9a3');
-    /* ★ 2026-08-23：「できれば屋外」で31以上の時刻は、数字を出さない。
-       ここに屋内の数字を入れると、屋外の数字（他の行）と同じ列に並んでしまい、
-       「12時=258 の方が 11時=816 より少ない」と読めてしまう。
-       だが2つは別のものの目安で、そもそも比べられない
-       （他の行が屋外の数字である以上、この画面では屋内どうしの比較にもならない）。
-       屋内どうしを比べたい場合は、下の入口から屋内モードへ。行のクリックは殺さない。 */
+    /* ★ 2026-09-02：バッジは廃止した。31以上であることは、暑さ指数のピルが赤くなることと、
+       発汗量の欄の「外出をおすすめしません」で足りる。
+       （以前は「31以上・屋内のみ」／「外は31以上」の灰バッジを出していた） */
+    if(st[h].gate && state.place!=='in') b.classList.add('dim');
+    /* ★ 2026-09-02：暑さ指数の色は、左端5pxの色帯から時刻の右のピルへ移した。
+       緑=28未満／黄=28以上／赤=31以上。ピルの上に白文字を載せるので、
+       28未満と28以上は凡例ごと少し暗くしてある（#79c9a3→#5aa886／#f2c94c→#d9a616）。 */
+    const lv = st[h].gate ? 'r' : (st[h].wbgt>=28 ? 'y' : 'g');
+    /* ★ 2026-08-23：「できれば屋外」で31以上の時刻は、屋外の数字を出さない。
+       屋内の数字を入れると、他の行（屋外の数字）と同じ列に並んで比べられてしまうが、
+       2つは別のものの目安で、そもそも比べられない。行のクリックは殺さない。
+       ★ 2026-09-02：「—」だけでは理由が読めないので、言葉にした。 */
     const gOut = st[h].gate && state.place!=='in';
     const mlHtml = gOut
-      ? `<span class="ml"><b>—</b><i>&nbsp;</i></span>`
-      : `<span class="ml"><b>${Math.round(st[h].best)}</b><i>mL</i></span>`;
-    const subTxt = gOut ? '屋外の目安は出しません'
-                        : (state.place==='in'?'屋内の':'')+'発汗量目安';
-    b.innerHTML=`<i class="chip" style="background:${lv}"></i><span class="t">${h}時</span>`
-      +`<span class="mid"><span class="bd">${badge}</span>`
+      ? `<span class="ng"><span>外出を</span><span>おすすめしません</span></span>`
+      : `<span class="ml">${Math.round(st[h].best)}<i>mL</i></span>`;
+    b.innerHTML=`<span class="t">${h}時</span>`
+      +`<span><b class="pill ${lv}">${st[h].wbgt.toFixed(1)}</b></span>`
+      +`<span class="mid"><span class="bd"><span class="pc">${sh.toFixed(0)}%</span></span>`
       +`<span class="bar"><i style="width:${sh.toFixed(0)}%"></i></span></span>`
-      +`<span class="s">${mlHtml}<span class="sub">${subTxt}</span><span class="sub">暑さ指数 ${st[h].wbgt.toFixed(1)}${(!state.fc&&WSD[h])?'±'+WSD[h].toFixed(1):''}</span></span>`
+      +`<span class="mlc">${mlHtml}</span>`
       +`<span class="ch">›</span>`;
     /* ★ 2026-08-29（C53）：render() は async。await しないと、影JSONの取得中に
        ②のカードが未描画のままスクロールが走り、行き先を飛び越える。 */
@@ -1032,11 +1062,43 @@ function renderHours(st){
     if(state.place!=='in' && (st[h].gate||st[prev].gate)) continue;
     if(st[h].best>st[prev].best) wz.push(`${h}時は${prev}時より悪くなります`);
   }
+  /* ★ 2026-09-02：暑さ指数の ± は行から外し、6行の下の注記にまとめた。 */
+  const sds=K.hours.filter(h=>!state.fc&&WSD[h]).map(h=>`${h}時±${WSD[h].toFixed(1)}`);
+  $('#hnote').textContent='歩道の日陰割合は、出発地から半径400mの歩道のうち、日陰になっている長さの割合です。'
+    +(sds.length?`暑さ指数のばらつき（去年8月）は ${sds.join('／')} です。`:'');
   const wv=$('#worse');
   if(wz.length){wv.classList.remove('hidden');
     wv.innerHTML='★ <b>待てば良くなる、とは限りません。</b>'+wz.join('。')+'。';}
   else wv.classList.add('hidden');
 }
+
+/* ===================== 条件チップ ===================== */
+/* ★ 2026-09-02：進んだ先でも、いま何で計算しているかが見えて、そこへ戻れるようにする。
+   チップ自体が戻り先（屋内外・遊び方・滞在は条件設定へ、時刻は①へ、行き先は②へ）。
+   飛び先が同じ3つは1チップにまとめてある。
+   出発地と体重は、普通は途中で変えないので入れていない。 */
+const METS_SHORT={'5.80':'ずっと走る','4.90':'走り回る中心','4.00':'半々',
+  '3.10':'座って遊ぶ中心','2.20':'ほとんど座る'};
+const condChip=(label,target)=>`<button class="c" data-go="${target}">${label}<em>›</em></button>`;
+function renderCond(){
+  const ms=METS_SHORT[state.mets.toFixed(2)]||`METs ${state.mets.toFixed(2)}`;
+  const base=condChip((state.place==='in'?'<b>屋内</b>':'できれば<b>屋外</b>')
+    +`／<b>${ms}</b>／滞在<b>${state.stay}分</b>`,'orig');
+  const hour=condChip(`<b>${state.hour}時</b>に出発`,'step1');
+  const list=state.res?(isIndoor(state.res)?state.res.indoor:state.res.outdoor):null;
+  const t=list?list[state.pickIdx]:null;
+  const dest=t?condChip(`<b>${t.name}</b>へ`,'step2'):'';
+  const lbl='<span class="cl">いまの条件（タップで変更）</span>';
+  $('#cond1').innerHTML=lbl+`<div class="cs">${base}</div>`;
+  $('#cond2').innerHTML=lbl+`<div class="cs">${base}${hour}</div>`;
+  $('#cond3').innerHTML=lbl+`<div class="cs">${base}${hour}${dest}</div>`;
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.cond .c'); if(!b) return;
+  const g=b.dataset.go;
+  const el=(g==='orig')?document.querySelector('.orig'):document.getElementById(g);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+});
 
 /* ===================== ③ 行き先 ===================== */
 async function renderCards(res){
@@ -1067,7 +1129,9 @@ async function renderCards(res){
       +`<div class="mt">片道 ${t.dist1}m・歩いて約${Math.round(t.dist1/53.1)}分／往復で日なたにいる時間 ${t.sunMin.toFixed(0)}分</div>`
       +`<div class="ml">水 <b>${Math.round(t.total)}mL</b> 分の暑さ`
       +`<span style="color:var(--muted)">（往復 ${Math.round(t.move)} ＋ 滞在${state.stay}分 ${Math.round(t.stay)}）</span></div>`
-      +(t.indoor?hoursHtml(t.name):'');
+      +(t.indoor?hoursHtml(t.name):'')
+      /* ★ 2026-09-02：カードに入口を付けた。以前は › すら無く、押せることが分からなかった。 */
+      +`<div class="go">日陰の道を見る<i>›</i></div>`;
     btn.appendChild(body);
     btn.onclick=async()=>{state.pickIdx=i;await render();document.getElementById('step3').scrollIntoView();};
     c.appendChild(btn);
@@ -1282,8 +1346,7 @@ async function render(){
       $('#outsidePick').onclick=async()=>{
         const pw=$('#pickWrap');
         pickWide=true;
-        if(pw.classList.contains('hidden')) $('#pickBtn').click();
-        else await drawPick(true);
+        await drawPick(true);   /* ★ 2026-09-02：地図は常に出ているので、開く分岐を外した */
         pw.scrollIntoView({block:'center',behavior:'smooth'});
       };
       if(state.prev){state.x=state.prev.x;state.y=state.prev.y;
@@ -1310,6 +1373,7 @@ async function render(){
       $('#r4').innerHTML=`${state.hour}時に ${t.name} へ行くなら、往復で日なたにいる時間は <b>${t.sunMin.toFixed(0)}分</b>です。15分ごとに給水してください。`;
       $('#gmap').href=gmapUrl(segs,t);
     }
+    renderCond();
     if(MP) drawPick(false);
   }finally{busy=false;}
 }
@@ -1318,7 +1382,8 @@ async function render(){
 let pickWide=false;   /* 範囲外の案内から開いたときだけ true。範囲の全体を見せる */
 async function drawPick(refit){
   const m=MP; if(!m)return;
-  m.shadow=await shadowFor(state.hour);
+  /* ★ 2026-09-02：ここで影を待つのをやめた。出発地の地図は影を描かない（paintPick 参照）ので、
+     1MBの影JSONを待つ必要が無い。地図を最初から出すようにしたぶん、初期描画を早くする。 */
   if(refit){
     /* ★ pickWide のときは、答えられる範囲の全体が入る倍率に引く（範囲外の案内から開いたとき）。
        既定は出発地の±450m。 */
@@ -1550,20 +1615,19 @@ $('#bw').addEventListener('change',e=>{
   v=Math.min(Math.max(v,12),22);
   e.target.value=v; state.bw=v; render();});
 /* ★ 2026-08-22：滞在時間。全候補に等しく効くので③の順位は動かないが、②の目安mLは動く。 */
-$('#pickBtn').onclick=()=>{
-  const w=$('#pickWrap');w.classList.toggle('hidden');
-  if(!w.classList.contains('hidden')){
-    if(!MP){
-      MP=makeMap($('#pickMap'),{onTap:([x,y])=>{
-        state.x=x;state.y=y;lastKey='';
-        const near=nearestLabel(x,y);
-        $('#originLabel').textContent=near?`${near.n} のあたり`:'地図で指定した場所';
-        render();}});
-      MP.interactive(()=>paintPick());
-      drawPick(true);
-    }else drawPick(false);
-  }
-};
+/* ★ 2026-09-02：地図は最初から出す。以前は「地図から選ぶ」を押した時だけ作っていた。 */
+function openPick(){
+  if(MP) return drawPick(false);
+  MP=makeMap($('#pickMap'),{onTap:([x,y])=>{
+    state.x=x;state.y=y;lastKey='';
+    const near=nearestLabel(x,y);
+    $('#originLabel').textContent=near?`${near.n} のあたり`:'地図で指定した場所';
+    render();}});
+  MP.interactive(()=>paintPick());
+  return drawPick(true);
+}
+/* ★ 2026-09-02：条件を決め終わったら①へ送る。計算はもう走っているので移動だけ。 */
+$('#searchBtn').onclick=()=>{$('#step1').scrollIntoView({behavior:'smooth',block:'start'});};
 /* 出発地の説明に、いちばん近い目印の名前を使う。緯度経度の数字より読める */
 function nearestLabel(x,y){
   if(!D_.labels)return null;
@@ -1626,7 +1690,7 @@ async function useForecast(auto){
   if(state.fc){state.fc=null;b.textContent='今日の値に戻す';b.classList.remove('on');
     $('#fcSrc').innerHTML='いま使っているのは <b>去年8月の平均時刻差</b> です'
       +'（2025年8月・3地点・31日の実測から作った、13時を基準にした時刻差）。'
-      +'各行の ± はそのばらつきです。';
+      +'ばらつきは6時刻の下に書いています。';
     render();return;}
   b.textContent='取得中…';b.disabled=true;
   try{
@@ -1691,7 +1755,7 @@ async function useForecast(auto){
     render();
   }catch(e){state.fc=null;b.textContent='今日の値に戻す';b.disabled=false;
     $('#fcSrc').innerHTML='<b>★ 今日の暑さ指数を取れませんでした。</b>'
-      +'いまは去年8月の平均時刻差で計算しています。各行の ± はそのばらつきです。'
+      +'いまは去年8月の平均時刻差で計算しています。ばらつきは6時刻の下に書いています。'
       +(auto?'':'（'+e.message+'）');
     render();}
 }
@@ -1713,15 +1777,18 @@ $('#fc').onclick=()=>useForecast(false);
     window.kokage={state, render, ll2xy, xy2ll, setOrigin(lat,lon){
       const q=ll2xy(lat,lon); state.x=q.x; state.y=q.y; lastKey=''; return render();}};
     await render();
+    /* ★ 2026-09-02：出発地の地図を最初から出す（描画は最初の render() のあと） */
+    openPick();
     /* ★ 2026-08-29：最初の描画が終わってから建物を取り、届いたら描き足す
-       （届かなくても画面は成立する） */
-    loadFoot().then(()=>render()).catch(()=>{});
+       （届かなくても画面は成立する）
+       ★ 2026-09-02：出発地の地図も建物を使うので、届いたら描き直す */
+    loadFoot().then(()=>{render();paintPick();}).catch(()=>{});
     /* ★ 2026-08-22：まず WOFF で描いてから、今日の実況＋予測に差し替える。
        先に描くのは、APIが遅い／届かない環境でも画面が出るようにするため。 */
     if(!NO_AUTO_FC) useForecast(true);
     else $('#fcSrc').innerHTML='いま使っているのは <b>去年8月の平均時刻差</b> です'
       +'（2025年8月・3地点・31日の実測から作った、13時を基準にした時刻差）。'
-      +'各行の ± はそのばらつきです。';
+      +'ばらつきは6時刻の下に書いています。';
   }catch(e){
     const b=$('#boot');b.classList.remove('hidden');
     b.innerHTML=`読み込みに失敗しました：${e.message}<br>同じフォルダの JSON を読みます。`
