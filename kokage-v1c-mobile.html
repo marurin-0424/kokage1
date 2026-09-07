@@ -191,6 +191,17 @@ display:flex;align-items:center;justify-content:center;font-size:15px;font-style
 .steps .o{color:var(--shade);font-weight:700}
 .gmap{display:block;margin-top:12px;padding:10px 12px;border-radius:9px;background:#fff;
 border:1.5px solid var(--hair);text-align:center;font-size:13.5px;color:var(--ink);text-decoration:none}
+/* ★ 2026-09-06：暑い日の例（roadmap.md §5-c C1）。
+   秋に開くと6時刻すべてが28未満で、31以上のゲートが画面に一度も出ない。
+   既定は変えず（2026-08-29 の決定）、入口を1つ足すだけにする。 */
+.hotbar{background:#fff1e6;border:1.5px solid var(--sun);border-radius:12px;
+  padding:10px 12px;margin:0 0 12px;font-size:12.5px;line-height:1.7}
+.hotbar .t{font-weight:700;color:var(--sun);font-size:13px}
+.hotbar button,#hotExBtn{margin-top:8px;width:100%;padding:10px;font-size:13px;font-weight:700;
+  border-radius:9px;border:1.5px solid var(--hair);background:#fff;color:var(--ink);
+  font-family:inherit;cursor:pointer}
+#hotEx{margin-top:12px}
+#hotEx .note{margin:0}
 .disc{background:#fff8e6;border:1px solid var(--warning);border-radius:12px;padding:12px 14px;font-size:12.5px;margin:14px 0}
 details{background:var(--surface);border:1px solid var(--hair);border-radius:12px;padding:10px 14px;margin:10px 0}
 /* ★ 2026-08-31：この画面からトップページ（作り方・現地確認・出典・「今ないデータ」）へ
@@ -297,6 +308,12 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
 <section class="step" id="step1">
   <div class="cond" id="cond1"></div>
   <span class="no">1／いつ出かけるか</span>
+  <!-- ★ 2026-09-06：例を表示している間は、今日の値でないことを一番上で言う -->
+  <div class="hotbar hidden" id="hotBar">
+    <div class="t">いまは「暑い日の例」を表示しています</div>
+    暑さ指数を <b>31.5</b> に置き換えた画面です。<b>今日の値ではありません。</b>時刻ごとの差（去年8月の平均時刻差、または今日の予測）はそのまま使っています。
+    <button id="hotBack">今日の値に戻す</button>
+  </div>
   <h2 id="gateH">今日は出かけられます。</h2>
   <div id="gateBox"></div>
   <p class="lead" id="gateLead" style="margin:0 0 10px"></p>
@@ -319,6 +336,11 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
       <span><i style="background:#5aa886"></i>28未満</span>
       <span><i style="background:#d9a616"></i>28以上（子どもは外出を避けたい）</span>
       <span><i style="background:#d03b3b"></i>31以上（大人でも避けたい）</span>
+    </div>
+    <!-- ★ 2026-09-06：6時刻すべてが28未満のときだけ出す（夏には出ない） -->
+    <div id="hotEx" class="hidden">
+      <p class="note">今日は6時刻とも暑さ指数28未満で、外出をためらう時間帯がありません。</p>
+      <button id="hotExBtn">暑い日（暑さ指数31.5）の例を見る</button>
     </div>
     <p class="worse hidden" id="worse"></p>
     <p class="note" id="hnote"></p>
@@ -376,6 +398,8 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
     <span><i style="background:#aeb6bf"></i>建物と高架の影</span>
     <span><i style="background:var(--park)"></i>行き先</span>
     <span><i class="rnd" style="background:#1e9ad6"></i>給水スポット</span>
+    <span><i style="background:#9a968d"></i>バス停</span>
+    <span><i style="background:#f9ab00"></i>地下鉄の出入口</span>
   </div>
   <p class="note">ドラッグで移動、ピンチ／ホイールで拡大縮小、ダブルタップで元の範囲に戻ります。拡大すると郵便局や交番まで出ます。</p>
   <p class="note cred">地図：次の6点を丸山倫太朗が加工して作成しました。3D都市モデル（Project PLATEAU）豊島区（2025年度）／東京都／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／歩行空間ネットワークデータ（池袋駅周辺）／国土交通省／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／公共施設一覧／豊島区／<a href="https://creativecommons.org/licenses/by/2.1/jp/" target="_blank" rel="noopener">CC BY 2.1 日本</a>／赤ちゃん・ふらっと一覧／東京都福祉局／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／Tokyowater Drinking Station 一覧／東京都水道局／<a href="https://creativecommons.org/licenses/by/4.0/deed.ja" target="_blank" rel="noopener">CC BY 4.0</a>／公園・緑地等（緑のオープンデータ GISデータ）／東京都都市整備局／<a href="https://catalog.data.metro.tokyo.lg.jp/dataset/t000008d2000000024" target="_blank" rel="noopener">クリエイティブ・コモンズ 表示（CC BY）</a>。東京都・国土交通省・豊島区が作成したものではありません。</p>
@@ -468,13 +492,14 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
 </div>
 </details>
 <nav class="about">
-  <div class="h">この作品について</div>
-  <p class="s">作り方・現地での答え合わせ・出典をまとめたページです（別のタブで開きます）。</p>
-  <a href="./#scope" target="_blank" rel="noopener">いま答えられる範囲 →</a>
-  <a href="./#flow" target="_blank" rel="noopener">入力から mL が出るまで（1枚図）→</a>
-  <a href="./#field" target="_blank" rel="noopener">現地で3回、答え合わせをしました →</a>
+  <div class="h">本サービスについて</div>
+  <p class="s">対応範囲・推定方法・実地検証・出典をまとめたページです（別のタブで開きます）。</p>
+  <a href="./#scope" target="_blank" rel="noopener">現在のサービス対応範囲 →</a>
+  <a href="./#flow" target="_blank" rel="noopener">発汗量の推定方法 →</a>
+  <a href="./#field" target="_blank" rel="noopener">データ・出力の実地検証 →</a>
+  <a href="./#prior" target="_blank" rel="noopener">類似サービスとの相違点 →</a>
   <a href="./#data" target="_blank" rel="noopener">使っているオープンデータ →</a>
-  <a href="./#ops" target="_blank" rel="noopener">これから、誰が続けるのか →</a>
+  <a href="./#ops" target="_blank" rel="noopener">運用体制 →</a>
   <a href="./missing-data.html" target="_blank" rel="noopener"><b>今ないデータ（23件）→</b></a>
 </nav>
 </div>
@@ -777,8 +802,11 @@ function makeMap(cv,opt){
       for(const p of D_.points){
         if(p.x<vb[0]||p.x>vb[1]||p.y<vb[2]||p.y>vb[3])continue;
         const q=proj([p.x,p.y]);
-        ctx.fillStyle=p.t==='sub'?'#4a3aa7':'#52514e';
-        ctx.beginPath();ctx.arc(q[0],q[1],3,0,7);ctx.fill();
+        /* ★ 2026-09-06：給水スポット（丸・水色・「水」）と取り違えられないよう、
+           交通の目印は角丸正方形にして形で分けた。あわせて凡例に2行足している。
+           色は バス停＝淡いグレー／地下鉄の出入口＝黄色。 */
+        ctx.fillStyle=p.t==='sub'?'#f9ab00':'#9a968d';
+        ctx.beginPath();ctx.roundRect(q[0]-3,q[1]-3,6,6,1.5);ctx.fill();
       }
     }
     const list=(extra||[]).concat(
@@ -1381,6 +1409,10 @@ async function render(){
     }
     drawTimeline(st);
     renderHours(st);
+    /* ★ 2026-09-06：6時刻すべてが28未満のときだけ「暑い日の例」の入口を出す。
+       夏に使う人には出ない。例を表示している間は入口を隠し、代わりに帯を出す。 */
+    $('#hotEx').classList.toggle('hidden', hotEx || !HRS.every(h => wbgtAt(h) < 28));
+    $('#hotBar').classList.toggle('hidden', !hotEx);
     const res=st[state.hour].res;
     state.res=res;
     const list=isIndoor(res)?res.indoor:res.outdoor;
@@ -1560,7 +1592,20 @@ function paintPick(){
 }
 
 /* ===================== UI 配線 ===================== */
+/* ★ 2026-09-06：暑い日の例。既定（今日の実況＋予測）は変えず、入口を1つ足すだけ。
+   ［実測 2026-09-06］31.5 だと 11〜14時が赤・15時が黄・16時が緑で、
+   ゲートが働いているのが見え、なお「16時なら行ける」という答えが残る。
+   31.0 は13時だけ赤、33.0 は全滅して行き先が1つも出ない。 */
+const HRS=[11,12,13,14,15,16], HOT_EX=31.5;
+let hotEx=false, hotPrev=null;
+function setWbgt(v){ state.wbgt=v; const s=$('#wbgt'); if(s) s.value=v;
+  const o=$('#wbgtV'); if(o) o.textContent=v.toFixed(1); }
+$('#hotExBtn').onclick=()=>{ hotPrev=state.wbgt; hotEx=true; setWbgt(HOT_EX);
+  $('#step1').scrollIntoView({behavior:'smooth',block:'start'}); render(); };
+$('#hotBack').onclick=()=>{ hotEx=false; setWbgt(hotPrev!=null?hotPrev:29.0); hotPrev=null; render(); };
+
 $('#wbgt').addEventListener('input',e=>{
+  hotEx=false;                                  /* 手で動かしたら例は解除 */
   state.wbgt=parseFloat(e.target.value);$('#wbgtV').textContent=state.wbgt.toFixed(1);
   $('#liveSrc').textContent='手で上書きした値です。';
   render();});
@@ -1682,6 +1727,7 @@ $('#live').onclick=async()=>{
     const cand=[ne,tk].filter(Boolean);
     if(!cand.length) throw new Error('値が空でした');
     const top=cand.reduce((a,x)=>x.v>a.v?x:a);
+    hotEx=false;                                 /* 実況を取り込んだら例は解除 */
     state.wbgt=top.v;$('#wbgt').value=top.v;$('#wbgtV').textContent=top.v.toFixed(1);
     /* ★ 2026-08-22：スライダーを details の中へ畳んだので、取り込みの結果は
        畳まれていない #liveSrc に出す（#wbgtSrc に書くと閉じている間は見えない）。 */
