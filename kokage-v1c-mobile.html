@@ -176,6 +176,14 @@ display:flex;align-items:center;justify-content:center;font-size:15px;font-style
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--ink2);margin-top:8px}
 .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
 .legend i.rnd{border-radius:50%}
+/* ★ 2026-09-08：歩道は「面」ではなく「線」なので、色見本も線にする。
+   四角のチップだと、塗られた面のことだと読まれる。 */
+.legend i.ln{width:22px;height:3px;border-radius:2px;vertical-align:3px}
+.legend i.ln.big{width:34px;height:4px}
+.legend.pick{margin-top:6px;display:block}
+.legend.pick .hd{display:block;margin-bottom:5px}
+.legend.pick .it{margin-right:12px}
+.legend .hl{font-weight:600;color:var(--ink)}
 /* ★ 2026-08-31（P33）：開館時間であることを見出しで示す */
 .hrs .hlbl{display:block;font-size:11px;font-weight:700;color:#12885f;letter-spacing:.04em;margin-bottom:2px}
 .hrs.none .hlbl{color:#7a5800}
@@ -240,6 +248,15 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
   <div id="outside" class="crit hidden"></div>
   <div class="pickwrap" id="pickWrap" style="margin-top:0">
     <canvas id="pickMap" width="720" height="480"></canvas>
+  </div>
+  <!-- ★ 2026-09-08：①にも凡例を置いた。1行目に歩道だけを単独で出す。
+       この画面の用事は「どこをタップするか」なので、紫の線が何かを最初に言い切る。
+       「この線の上から選べる」まで書いて、凡例に操作の説明を兼ねさせている。 -->
+  <div class="legend pick">
+    <span class="hd"><i class="ln big" style="background:#c9c0ef"></i><span class="hl">紫の線＝歩ける道（歩道）</span>。この線の上から出発地を選べます。</span>
+    <span class="it"><i class="rnd" style="background:#1e9ad6"></i>給水スポット</span>
+    <span class="it"><i style="background:#9a968d"></i>バス停</span>
+    <span><i style="background:#f9ab00"></i>地下鉄の出入口</span>
   </div>
   <div class="r" style="margin-top:8px">
     <button id="geo">現在地</button>
@@ -395,7 +412,12 @@ tr>*:first-child{white-space:nowrap;width:1%;padding-right:10px}
   <div class="legend">
     <span><i style="background:var(--sun)"></i>日なたの歩道</span>
     <span><i style="background:var(--shade)"></i>日陰の歩道</span>
-    <span><i style="background:#aeb6bf"></i>建物と高架の影</span>
+    <!-- ★ 2026-09-08：色見本が v9 より前の #aeb6bf のままだった。
+         実際は #31538c を 32% で地(#e4e4e0)に載せた色。描画から拾った実測値に直す。 -->
+    <span><i style="background:#aab5c5"></i>建物と高架の影</span>
+    <!-- ★ 2026-09-08：紫の線の説明が無かった。①の凡例と同じものを指すが、
+         ③では上の2つ（日なた／日陰）がルートを指すので、区別できる言い方にする。 -->
+    <span><i class="ln" style="background:#c9c0ef"></i>歩道（ルート以外）</span>
     <span><i style="background:var(--park)"></i>行き先</span>
     <span><i class="rnd" style="background:#1e9ad6"></i>給水スポット</span>
     <span><i style="background:#9a968d"></i>バス停</span>
@@ -732,9 +754,28 @@ function bboxOf(pg){
   try{Object.defineProperty(pg,'__bb',{value:[a,b,c,d],enumerable:false});}catch(e){}
   return [a,b,c,d];
 }
+function shadeAll(m,polys,color,alpha){
+  if(!polys)return;
+  const vb=m.view();
+  m.ctx.save();m.ctx.globalAlpha=alpha;m.ctx.fillStyle=color;m.ctx.beginPath();
+  for(const pg of polys){
+    const bb=bboxOf(pg);
+    if(bb[1]<vb[0]||bb[0]>vb[1]||bb[3]<vb[2]||bb[2]>vb[3])continue;
+    const rs=Array.isArray(pg[0][0])?pg:[pg];
+    for(const r of rs){if(r.length<3)continue;let p=m.proj(r[0]);m.ctx.moveTo(p[0],p[1]);
+      for(let i=1;i<r.length;i++){p=m.proj(r[i]);m.ctx.lineTo(p[0],p[1]);}m.ctx.closePath();}
+  }
+  m.ctx.fill('nonzero');m.ctx.restore();
+}
 function makeMap(cv,opt){
   opt=opt||{};
-  const ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  const _cwR=cv.getBoundingClientRect();
+  const _cw=Math.round(_cwR.width)||Math.round(cv.width/2);
+  const _ch=Math.round(_cw*cv.height/cv.width);
+  const _dd=Math.min(window.devicePixelRatio||1,2);
+  cv.width=Math.round(_cw*_dd);cv.height=Math.round(_ch*_dd);
+  const ctx=cv.getContext('2d');ctx.setTransform(_dd,0,0,_dd,0,0);
+  const W=_cw,H=_ch;
   const v={cx:0,cy:0,span:900};
   let home=null, redraw=null;
   const proj=p=>{const k=W/v.span;return [(p[0]-v.cx)*k+W/2, H/2-(p[1]-v.cy)*k];};
@@ -769,13 +810,14 @@ function makeMap(cv,opt){
   function sunArrow(hour){
     const az=AZ[hour]; if(az===undefined) return;
     const th=(az-180)*Math.PI/180;      // 平面直角：+Y が北。南=0
-    const cx=68,cy=64,r=30;
+    const r=Math.max(13,Math.min(22,W*0.055)), cx=r+13, cy=r+13;
     const dx=Math.sin(th)*r, dy=-Math.cos(th)*r;
     ctx.save();ctx.setLineDash([4,3]);ctx.strokeStyle='#eb6834';ctx.lineWidth=2;
     ctx.beginPath();ctx.moveTo(cx+dx,cy+dy);ctx.lineTo(cx-dx,cy-dy);ctx.stroke();ctx.restore();
-    ctx.fillStyle='#eb6834';ctx.beginPath();ctx.arc(cx+dx,cy+dy,4.5,0,7);ctx.fill();
-    ctx.fillStyle='#898781';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.textBaseline='top';
-    ctx.fillText('太陽の方向',cx+38,cy-8);}
+    ctx.fillStyle='#eb6834';ctx.beginPath();ctx.arc(cx+dx,cy+dy,4,0,7);ctx.fill();
+    ctx.font='10px sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.lineWidth=3;ctx.strokeStyle='rgba(255,255,255,.92)';ctx.strokeText('太陽の方向',cx,cy+r+5);
+    ctx.fillStyle='#7a7873';ctx.fillText('太陽の方向',cx,cy+r+5);ctx.textAlign='left';}
   /* 北。太陽の方向だけでは向きの手がかりが無い */
   function northArrow(){
     const x=W-34,y=34,r=17;
@@ -793,12 +835,14 @@ function makeMap(cv,opt){
   function labels(extra,skip){
     if(!D_.labels)return;
     /* 方位マーク・縮尺・太陽の矢印の場所は先に埋めておく。重なると読めない */
-    const placed=[[W-62,0,W,62],[W-150,H-46,W,H],[0,26,190,110]];
+    const placed=[[W-62,0,W,62],[W-150,H-46,W,H],[0,0,116,86]];
     const vb=view();
     const maxRank = v.span>1500 ? 1 : (v.span>700 ? 2 : 3);
     const hit=(a)=>placed.some(b=>!(a[2]<b[0]||a[0]>b[2]||a[3]<b[1]||a[1]>b[3]));
     // 記号（地下出入口・停留所）は近いときだけ
-    if(v.span<=900){
+    /* ★ 2026-09-08：①は既定が span 1,352 なので、900 の条件だと記号が1つも出ない。
+       凡例を置く画面なので、marks:true の地図では倍率によらず出す。 */
+    if(v.span<=900||opt.marks){
       for(const p of D_.points){
         if(p.x<vb[0]||p.x>vb[1]||p.y<vb[2]||p.y>vb[3])continue;
         const q=proj([p.x,p.y]);
@@ -806,7 +850,10 @@ function makeMap(cv,opt){
            交通の目印は角丸正方形にして形で分けた。あわせて凡例に2行足している。
            色は バス停＝淡いグレー／地下鉄の出入口＝黄色。 */
         ctx.fillStyle=p.t==='sub'?'#f9ab00':'#9a968d';
-        ctx.beginPath();ctx.roundRect(q[0]-3,q[1]-3,6,6,1.5);ctx.fill();
+        /* ★ 2026-09-08：6px → 4px。①で常時出すようにしたら、池袋駅まわりの
+           出入口が塊になってラベルを覆った。形（角丸正方形）で給水と分けているので、
+           大きさは要らない。 */
+        ctx.beginPath();ctx.roundRect(q[0]-2,q[1]-2,4,4,1);ctx.fill();
       }
     }
     const list=(extra||[]).concat(
@@ -1186,17 +1233,22 @@ function drawPark(cv,t,shadowRings){
   const pts=[];
   for(const pg of rings){const rs=Array.isArray(pg[0][0])?pg:[pg];for(const p of rs[0])pts.push(p);}
   m.fit(pts,30);
-  m.poly(D_.foot,'#f1f0ed','#e0ded7');
+  m.ctx.fillStyle='#e4e4e0';m.ctx.fillRect(0,0,m.W,m.H);
   // 公園の中だけ影を描く
   m.ctx.save();
   m.ctx.beginPath();
   for(const pg of rings){const rs=Array.isArray(pg[0][0])?pg:[pg];
     for(const r of rs){let p=m.proj(r[0]);m.ctx.moveTo(p[0],p[1]);
       for(let i=1;i<r.length;i++){p=m.proj(r[i]);m.ctx.lineTo(p[0],p[1]);}m.ctx.closePath();}}
-  m.ctx.fillStyle='#eaf6ef';m.ctx.fill('evenodd');
+  m.ctx.fillStyle='#cfe6cf';m.ctx.fill('evenodd');
   m.ctx.clip('evenodd');
-  m.poly(shadowRings,'#2a78d6',null);
+  /* ★ 2026-09-07：カードの影を青→グレーに。青の面は池に見える（今日、道を青みグレーに
+     したときと同じ誤読）。グレーなら「芝生に落ちた影」として読める。
+     ★ あわせて道路の線を外した。カードの用事は「行き先の公園の日陰の形を見る」ことなので、
+     街路の情報は要らない。 */
+  m.poly(shadowRings,'#9ba1a6',null);
   m.ctx.restore();
+  m.poly(D_.foot,'#fdf8e6','#ddd0ac',0.7);   /* ★ ③と同じく建物は影の上 */
   m.poly(rings,null,'#1baf7a',2);
   m.sunArrow(state.hour);
   m.scalebar();
@@ -1238,15 +1290,32 @@ function paintRoute(){
   const m=M4; if(!m||!m.segs)return;
   const t0=performance.now();
   const t=m.t, rings=D_.parks[t.name];
-  m.clear();
-  m.poly(m.shadow,'#aeb6bf',null);
-  m.poly(D_.foot,'#f7f6f3','#e0ded7');
-  m.net();
-  if(rings) m.poly(rings,'rgba(27,175,122,.28)','#1baf7a',2);
+  /* ★ 2026-09-07：街路空間（車道＋歩道＋私有地）を1つの面にした。
+     以前は歩道を白6.5px＋枠9.5pxの「帯」で描いていたが、寄ると
+     ①建物と帯の隙間が歩道に見え ②帯が車道に見え ③その間の塗り残しが建物に見える、
+     という取り違えが起きていた。幅の大小で役割を推測させていたのが原因。
+     歩道は幅を主張しない細い線にし、面は地1色にまとめた。
+     ★ あわせて影を26%→32%に上げた。地の上に載せるぶん、薄いと日かげの読みが落ちるため
+     （実測：影による街路空間の色の変化量 26%で56 → 32%で70.7。白い道だった頃は67.1）。 */
+  /* ★ 2026-09-07（第2弾）：建物を「影の上」に移した。
+     影は地面への投影なので、建物の footprint に重なっている影は、実際にはその建物の
+     壁や屋根に落ちる影＝人が歩けない場所の影。画面の約50%がそれで占められており、
+     肝心の「どの道が日かげか」を埋もれさせていた（実測：B1とB3の画素差 16時49.8%／13時50.2%）。
+     建物で隠すのは見た目の調整ではなく、影を「歩ける場所」だけに限る修正。
+     ★ 副産物として、16時に建物と街路が見分けられない問題も消える（建物が影を受けないため）。
+     ★ 歩道の線は影の下のまま。日かげの歩道は紫がわずかに沈み、そこも情報になる。
+     ★ 歩道を紫にしたのは、白や砂色だと「地面の一種」として読まれ、
+     「これは歩道か車道か」という問いが立って隣の面と役割を取り合うため。
+     現実に無い色にすると、線は面ではなくデータとして読まれる。 */
+  m.ctx.fillStyle='#e4e4e0';m.ctx.fillRect(0,0,m.W,m.H);
+  m.net('#c9c0ef',2.5);
+  if(rings) m.poly(rings,'rgba(90,175,120,.32)','#3f9a63',2);
+  shadeAll(m,m.shadow,'#31538c',0.32);
+  m.poly(D_.foot,'#fdf8e6','#ddd0ac',0.7);
   m.ctx.lineCap='round';m.ctx.lineJoin='round';
-  for(const s of m.segs){
+  for(const _pp of [0,1]) for(const s of m.segs){
     const g=s.geom||[[K.b.nodes.x[s.u],K.b.nodes.y[s.u]],[K.b.nodes.x[s.v],K.b.nodes.y[s.v]]];
-    m.ctx.strokeStyle=s.shade>=0.5?'#2a78d6':'#eb6834';m.ctx.lineWidth=5;
+    m.ctx.strokeStyle=_pp?(s.shade>=0.5?'#2a78d6':'#eb6834'):'rgba(255,255,255,.95)';m.ctx.lineWidth=_pp?3.5:6.5;
     m.ctx.beginPath();let p=m.proj(g[0]);m.ctx.moveTo(p[0],p[1]);
     for(let i=1;i<g.length;i++){p=m.proj(g[i]);m.ctx.lineTo(p[0],p[1]);}m.ctx.stroke();
   }
@@ -1281,7 +1350,7 @@ function turnWord(d){
   return Math.abs(d)>65?'左へ':'ななめ左へ';
 }
 /* ★ 手順は「歩ける粒度」まで畳む。リンク1本ずつ出すと40行を超えて読めない。
-   ①日かげ/日なたが同じで、方位の変化が30度未満なら1本にまとめる（横断歩道は印だけ残す）
+   ①日かげ/日なたが同じで、方位の変化が30度未満なら1本にまとめる（横断の印だけ残す）
    ②それでも10行を超えるうちは、いちばん短い区間を隣に吸収させる */
 function renderTurns(segs){
   const ol=$('#turns');ol.innerHTML='';
@@ -1291,6 +1360,16 @@ function renderTurns(segs){
     const li=document.createElement('li');li.style.gridTemplateColumns='1fr';
     li.innerHTML='<span>出発地のすぐそばです。歩行空間ネットワークの上では同じ地点になりました。</span>';
     ol.appendChild(li);return;}
+  /* ★ 2026-09-07：横断の回数は「まとめる前」に数える。
+     以前は merged（最大10区間に丸めたあと）で数えていたので、1区間に2回以上の横断が
+     入ると取りこぼしていた（16時・東池袋中央公園で 実際12回→画面9回）。
+     連続する横断リンクは1回の横断としてまとめる（交差点は島や中央帯で分割されているため）。 */
+  let crossings=0, wasCross=false;
+  for(const s of segs){
+    const c=(s.struct===3||s.struct===4);
+    if(c&&!wasCross) crossings++;
+    wasCross=c;
+  }
   let merged=[];
   for(const s of segs){
     const g=s.geom||[[K.b.nodes.x[s.u],K.b.nodes.y[s.u]],[K.b.nodes.x[s.v],K.b.nodes.y[s.v]]];
@@ -1310,19 +1389,20 @@ function renderTurns(segs){
     if(s.dist>t.dist/2) t.shaded=s.shaded;
     merged.splice(k,1);
   }
-  const crossings=merged.filter(s=>s.cross).length;
   for(const s of merged){
     const li=document.createElement('li');
     const d=document.createElement('span');d.className='d';d.textContent=Math.round(s.dist)+'m';
     const x=document.createElement('span');
     const side=s.shaded?'<span class="o">日かげの歩道</span>':'<span class="x">日なたの歩道</span>';
-    x.innerHTML=(s.turn?s.turn+'、':'')+(s.cross?'横断歩道を渡って ':'')+side+'を進む';
+    x.innerHTML=(s.turn?s.turn+'、':'')+(s.cross?'道路を渡って ':'')+side+'を進む';
     li.appendChild(d);li.appendChild(x);ol.appendChild(li);
   }
   const head=document.createElement('li');
   head.style.gridTemplateColumns='1fr';
   head.innerHTML=crossings
-    ? `<span>途中で <b>${crossings}回</b>、道路の反対側へ渡ります。反対側の歩道の方が日陰だからです。</span>`
+    /* ★ 2026-09-07：「反対側の歩道の方が日陰だからです」を削除。横断は最小mL経路を
+       選んだ結果であって、日陰のために渡っているとは限らない（根拠が無い）。 */
+    ? `<span>途中で <b>${crossings}回</b>、道路を渡ります。</span>`
     : `<span>道路を渡らずに着きます。</span>`;
   ol.insertBefore(head,ol.firstChild);
 }
@@ -1546,7 +1626,7 @@ function veilLabel(m){
   const TXT='この外側は選べません';
   m.ctx.save();
   /* 画面上では canvas(720px) が幅390px前後に縮むので、20px でようやく11px相当に見える */
-  m.ctx.font='bold 20px system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif';
+  m.ctx.font='bold 12px system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif';
   m.ctx.textAlign='center'; m.ctx.textBaseline='middle';
   const tw=m.ctx.measureText(TXT).width, k=m.W/m.v.span, half=(tw/2+10)/k;
   const nx=9, ny=7, cand=[];
@@ -1578,14 +1658,35 @@ function paintPick(){
      あわせて図と地を反転した：建物を中間グレーで塗り、道路の側を白のまま残す。
      以前は建物 #f7f6f3・背景 白 でほぼ同じ明るさだったため、建物の隙間が道に見えなかった。
      歩行空間ネットワーク（＝道の形そのもの）も、消えかけていた 1px #e6e5df から上げている。 */
-  const BLD='#dcdad2', BLDL='#c6c3b9';
-  m.poly(D_.foot,BLD,BLDL);m.net('#8d9aa8',1.6);
+  /* ★ 2026-09-07：①も③と同じスタイルに統一した（地・建物・輪郭・歩道の色と太さ）。
+     以前は「①は白いベールを被せるので細い線が埋もれる」と考えて別扱いにしていたが、
+     それは白い線に限った話だった。この関数は「描く → ベールを被せる → もう一度描く」順なので、
+     線はベールの上にあり埋もれない。色が付いていれば成立する。
+     歩道の色は③と同じ #c9c0ef。①はルート線と競合しないので濃くする理由も無い。 */
+  /* ★ 2026-09-08：線幅だけ 2.5px → 1.75px にした。①は③より 1.43倍引き
+     （① 0.272 px/m ／ ③ 0.390 px/m）なので、同じ 2.5px でも地上では 9.2m 相当と 6.4m 相当。
+     画面上の太さではなく「地面での太さ」を③に合わせる（2.5 × 0.272/0.390 ≒ 1.75）。
+     描画順は③と違うまま（①は線が建物の上）。①の用事は「どこをタップできるか」なので、
+     建物で道を切ると連続性が読めなくなる。順を揃えないぶん、太さで釣り合いを取る。 */
+  const BLD='#fdf8e6', BLDL='#ddd0ac';
+  const _road=()=>{m.net('#c9c0ef',1.75);};
+  m.ctx.fillStyle='#e4e4e0';m.ctx.fillRect(0,0,m.W,m.H);
+  m.poly(D_.foot,BLD,BLDL,0.7);_road();
   coverageVeil(m);
-  m.poly(D_.foot,BLD,BLDL);m.net('#8d9aa8',1.6);
+  m.poly(D_.foot,BLD,BLDL,0.7);_road();
   m.labels([{n:'ここから出発',x:state.x,y:state.y,r:0,big:true,color:'#0b0b0b'}]);
   const o=m.proj([state.x,state.y]);
   m.ctx.fillStyle='#0b0b0b';m.ctx.beginPath();m.ctx.arc(o[0],o[1],8,0,7);m.ctx.fill();
   m.ctx.fillStyle='#fff';m.ctx.beginPath();m.ctx.arc(o[0],o[1],3.5,0,7);m.ctx.fill();
+  /* ★ 2026-09-08：給水スポットは③にしか描いていなかった。①にも凡例を置くので、
+     凡例にあって地図に無い状態にならないよう、こちらにも描く。 */
+  for(const w of (D_.water||[])){
+    const q=m.proj([w.x,w.y]);
+    m.ctx.fillStyle='#fff';m.ctx.beginPath();m.ctx.arc(q[0],q[1],8,0,7);m.ctx.fill();
+    m.ctx.fillStyle='#1e9ad6';m.ctx.beginPath();m.ctx.arc(q[0],q[1],6,0,7);m.ctx.fill();
+    m.ctx.fillStyle='#fff';m.ctx.font='bold 9px system-ui';m.ctx.textAlign='center';
+    m.ctx.fillText('水',q[0],q[1]+3.2);m.ctx.textAlign='left';
+  }
   coverageEdge(m);   /* ★ 建物と道を描き直したあとに置く。先に置くと線も字も半分埋まる */
   veilLabel(m);
   m.northArrow();m.scalebar();
@@ -1683,7 +1784,7 @@ $('#bw').addEventListener('change',e=>{
 /* ★ 2026-09-02：地図は最初から出す。以前は「地図から選ぶ」を押した時だけ作っていた。 */
 function openPick(){
   if(MP) return drawPick(false);
-  MP=makeMap($('#pickMap'),{onTap:([x,y])=>{
+  MP=makeMap($('#pickMap'),{marks:true,onTap:([x,y])=>{
     state.x=x;state.y=y;lastKey='';
     const near=nearestLabel(x,y);
     $('#originLabel').textContent=near?`${near.n} のあたり`:'地図で指定した場所';
